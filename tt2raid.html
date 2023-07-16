@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no">
+		<title></title>
+		<script src="https://cdn.bootcdn.net/ajax/libs/vue/2.6.0/vue.min.js"></script>
+		<style>
+			html{
+				font-size: 10px;
+			}
+			html,body{
+				margin: 0;
+			}
+			input,button,textarea{ border: none; background: transparent; vertical-align:middle; outline: none; overflow: visible;
+				-webkit-user-select: auto;
+			}
+			table{border-collapse:collapse;border-spacing:0;}
+			th{
+				text-align: left;
+			}
+			th,td{
+				padding: 0.5rem 1rem;
+				border: 1px solid #D4D4D4;
+				font-size: 1.4rem;
+				white-space: nowrap;
+			}
+			.inputbox{
+				padding: 2rem;
+			}
+			.input{
+				display: block;
+				width: calc(100% - 2.4rem);
+				height: 20rem;
+				padding: 1rem;
+				resize: none;
+				border: 0.2rem solid #B2B2B2;
+				border-radius: 1rem;
+			}
+			.input:focus{
+				border-color: #3399FF;
+			}
+			td[color="1"]{
+				background-color: #3399FF;
+			}
+			td[color="-1"]{
+				background-color: #EE5555;
+			}
+			th.cp{
+				cursor: pointer;
+			}
+			th.im{
+				color: #3399FF;
+			}
+			.oper{
+				display: flex;
+				padding: 0 1rem;
+			}
+			.btn{
+				width: 12rem;
+				height: 4rem;
+				margin: 0 1rem;
+				color: #FFFFFF;
+				background-color: #3399FF;
+				border: none;
+				cursor: pointer;
+			}
+			.table{
+				padding: 2rem;
+				overflow: auto;
+			}
+		</style>
+	</head>
+	<body>
+		<app></app>
+		<script>
+			new Vue({
+				el:'app',
+				data:{
+					input:'',
+					output:[],
+					sort:'dsd',
+					copytext:'',
+				},
+				computed:{
+					omit(){
+						return function(v){
+							return (v/1000000).toFixed(2);
+						};
+					},
+					maxqty(){
+						let num=0;
+						for(let item of this.output){
+							num=Math.max(num,item.qty);
+						};
+						return num;
+					},
+					admg(){
+						let num=0;
+						for(let item of this.output){
+							num+=item.dmg;
+						};
+						return num/this.output.length;
+					},
+					aavg(){
+						let num=0;
+						for(let item of this.output){
+							num+=item.avg;
+						};
+						return num/this.output.length;
+					},
+					qcolor(){
+						return function(v){
+							let color='#000000';
+							if(v==this.maxqty){
+								color='#3399FF';
+							};
+							if(v<this.maxqty-6){
+								color='#EE5555';
+							};
+							return color;
+						};
+					},
+					dcolor(){
+						return function(v){
+							let color='#000000';
+							if(v<=10){
+								color='#3399FF';
+							};
+							if(v==this.output.length){
+								color='#EE5555';
+							};
+							return color;
+						};
+					},
+					ncolor(){
+						return function(v,n){
+							let color='#000000';
+							if(v=='#3399FF'&&n=='#3399FF'){
+								color='#3399FF';
+							};
+							if(v=='#EE5555'&&n=='#EE5555'){
+								color='#EE5555';
+							};
+							return color;
+						};
+					},
+				},
+				template:`
+					<div>
+						<div class="inputbox">
+							<textarea class="input" v-model="input" placeholder="输入从游戏中导出的数据：部落->资讯->前次突袭->复制"></textarea>
+						</div>
+						<div class="oper">
+							<button class="btn" v-on:click="start">处理</button>
+							<button class="btn" v-on:click="copy">复制</button>
+						</div>
+						<div class="table">
+							<table ref="table">
+								<tr>
+									<th>名字</th>
+									<th>次数</th>
+									<th>总伤(M)</th>
+									<th class="cp" v-bind:class="{im:sort=='dsu'||sort=='dsd'}" v-on:click="dschange">排名 <span v-if="sort=='dsu'">▼</span><span v-else>▲</span></th>
+									<th>均伤(M)</th>
+									<th class="cp" v-bind:class="{im:sort=='asu'||sort=='asd'}" v-on:click="aschange">排名 <span v-if="sort=='asu'">▼</span><span v-else>▲</span></th>
+									<th>汇总</th>
+								</tr>
+								<tr v-for="(item,index) in output">
+									<td><font v-bind:color="ncolor(qcolor(item.qty),dcolor(item.dmgrank))">{{item.name}}</font></td>
+									<td><font v-bind:color="qcolor(item.qty)">{{item.qty}}</font></td>
+									<td><font v-bind:color="dcolor(item.dmgrank)">{{omit(item.dmg)}}</font></td>
+									<td>{{item.dmgrank}}</td>
+									<td>{{omit(item.avg)}}</td>
+									<td>{{item.avgrank}}</td>
+									<td>
+										<span v-if="index==0">人数</span>
+										<span v-if="index==1">{{output.length}}</span>
+										<span v-if="index==2">次数</span>
+										<span v-if="index==3">{{maxqty}}</span>
+										<span v-if="index==4">均总伤(M)</span>
+										<span v-if="index==5">{{omit(admg)}}</span>
+										<span v-if="index==6">均均伤(M)</span>
+										<span v-if="index==7">{{omit(aavg)}}</span>
+										<span v-if="index==8">满伤比</span>
+										<span v-if="index==9">{{(omit(admg)/maxqty/omit(aavg)).toFixed(2)}}</span>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</div>
+				`,
+				methods: {
+					start() {
+						this.output=[];
+						let input_td=this.input.split('\n');
+						let input_th=input_td.shift();
+						let totaldmg_json={};
+						for(let item of input_td){
+							let arr=item.split(',');
+							if(arr.length>1){
+								if(!!!totaldmg_json[arr[1]]){
+									totaldmg_json[arr[1]]={
+										name:arr[0],
+										qty:parseInt(arr[2]),
+										dmg:0,
+									};
+								};
+								totaldmg_json[arr[1]].dmg+=parseInt(arr[5]);
+							};
+						};
+						for(let index in totaldmg_json){
+							this.output.push({
+								id:index,
+								name:totaldmg_json[index].name,
+								qty:totaldmg_json[index].qty,
+								dmg:totaldmg_json[index].dmg,
+								avg:totaldmg_json[index].dmg/totaldmg_json[index].qty,
+							});
+						};
+						this.output.sort(function (a,b){
+							return b.avg-a.avg;
+						});
+						for(let index in this.output){
+							this.output[index].avgrank=parseInt(index)+1;
+						};
+						this.output.sort(function (a,b){
+							return b.dmg-a.dmg;
+						});
+						for(let index in this.output){
+							this.output[index].dmgrank=parseInt(index)+1;
+						};
+					},
+					dschange(){
+						if(this.sort=='dsd'){
+							this.sort='dsu';
+							this.output.sort(function (a,b){
+								return a.dmg-b.dmg;
+							});
+						}else{
+							this.sort='dsd';
+							this.output.sort(function (a,b){
+								return b.dmg-a.dmg;
+							});
+						};
+					},
+					aschange(){
+						if(this.sort=='asd'){
+							this.sort='asu';
+							this.output.sort(function (a,b){
+								return a.avg-b.avg;
+							});
+						}else{
+							this.sort='asd';
+							this.output.sort(function (a,b){
+								return b.avg-a.avg;
+							});
+						};
+					},
+					copy(){
+						window.getSelection().removeAllRanges();
+						let clipboard = navigator.clipboard;
+						let temp = document.createElement("div");
+						temp.innerHTML = this.$refs.table.outerHTML;
+						temp.innerHTML=temp.innerHTML.replace(/▲/g,"").replace(/▼/g,"");
+						document.body.appendChild(temp);
+						let range = document.createRange();
+						range.selectNode(temp);
+						window.getSelection().addRange(range);
+						document.execCommand("copy");
+						document.body.removeChild(temp);
+						window.getSelection().removeAllRanges();
+					},
+				},
+			});
+		</script>
+	</body>
+</html>
