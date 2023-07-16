@@ -56,6 +56,13 @@
 				display: flex;
 				padding: 0 1rem;
 			}
+			.header{
+				display: flex;
+				justify-content: space-between;
+				padding: 1rem 2rem;
+				font-size: 1.4rem;
+				background-color: #D4D4D4;
+			}
 			.btn{
 				width: 12rem;
 				height: 4rem;
@@ -111,36 +118,49 @@
 					},
 					qcolor(){
 						return function(v){
-							let color='#000000';
+							let color='';
 							if(v==this.maxqty){
-								color='#3399FF';
+								color='#add6ff';
 							};
 							if(v<this.maxqty-6){
-								color='#EE5555';
+								color='#f8bbbb';
 							};
 							return color;
 						};
 					},
 					dcolor(){
 						return function(v){
-							let color='#000000';
+							let color='';
 							if(v<=10){
-								color='#3399FF';
+								color='#add6ff';
 							};
 							if(v==this.output.length){
-								color='#EE5555';
+								color='#f8bbbb';
 							};
 							return color;
 						};
 					},
 					ncolor(){
 						return function(v,n){
-							let color='#000000';
-							if(v=='#3399FF'&&n=='#3399FF'){
-								color='#3399FF';
+							let num=0;
+							let color='';
+							if(v=='#add6ff'){
+								num++;
 							};
-							if(v=='#EE5555'&&n=='#EE5555'){
-								color='#EE5555';
+							if(v=='#f8bbbb'){
+								num--;
+							};
+							if(n=='#add6ff'){
+								num++;
+							};
+							if(n=='#f8bbbb'){
+								num--;
+							};
+							if(num>0){
+								color='#add6ff';
+							};
+							if(num<0){
+								color='#f8bbbb';
 							};
 							return color;
 						};
@@ -148,6 +168,10 @@
 				},
 				template:`
 					<div>
+						<div class="header">
+							<span>tt2raid</span>
+							<span>V0.0.12</span>
+						</div>
 						<div class="inputbox">
 							<textarea class="input" v-model="input" placeholder="输入从游戏中导出的数据：部落->资讯->前次突袭->复制"></textarea>
 						</div>
@@ -167,9 +191,12 @@
 									<th>汇总</th>
 								</tr>
 								<tr v-for="(item,index) in output">
-									<td><font v-bind:color="ncolor(qcolor(item.qty),dcolor(item.dmgrank))">{{item.name}}</font></td>
-									<td><font v-bind:color="qcolor(item.qty)">{{item.qty}}</font></td>
-									<td><font v-bind:color="dcolor(item.dmgrank)">{{omit(item.dmg)}}</font></td>
+									<td v-if="false"><font v-bind:color="ncolor(qcolor(item.qty),dcolor(item.dmgrank))">{{item.name}}</font></td>
+									<td v-if="false"><font v-bind:color="qcolor(item.qty)">{{item.qty}}</font></td>
+									<td v-if="false"><font v-bind:color="dcolor(item.dmgrank)">{{omit(item.dmg)}}</font></td>
+									<td v-bind:bgcolor="ncolor(qcolor(item.qty),dcolor(item.dmgrank))">{{item.name}}</td>
+									<td v-bind:bgcolor="qcolor(item.qty)">{{item.qty}}</td>
+									<td v-bind:bgcolor="dcolor(item.dmgrank)">{{omit(item.dmg)}}</td>
 									<td>{{item.dmgrank}}</td>
 									<td>{{omit(item.avg)}}</td>
 									<td>{{item.avgrank}}</td>
