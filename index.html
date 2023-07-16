@@ -6,6 +6,13 @@
 		<title></title>
 		<script src="https://cdn.bootcdn.net/ajax/libs/vue/2.6.0/vue.min.js"></script>
 		<style>
+			*{
+				font-family: "Microsoft Yahei";
+			}
+			i{
+				display: inline-block;
+				font-style: normal;
+			}
 			html{
 				font-size: 10px;
 			}
@@ -22,8 +29,15 @@
 			th,td{
 				padding: 0.5rem 1rem;
 				border: 1px solid #D4D4D4;
-				font-size: 1.4rem;
+				font-size: 1.6rem;
 				white-space: nowrap;
+			}
+			.header{
+				display: flex;
+				justify-content: space-between;
+				padding: 1rem 2rem;
+				font-size: 1.6rem;
+				background-color: #D4D4D4;
 			}
 			.inputbox{
 				padding: 2rem;
@@ -31,7 +45,7 @@
 			.input{
 				display: block;
 				width: calc(100% - 2.4rem);
-				height: 20rem;
+				height: 10rem;
 				padding: 1rem;
 				resize: none;
 				border: 0.2rem solid #B2B2B2;
@@ -54,27 +68,109 @@
 			}
 			.oper{
 				display: flex;
+				align-items: center;
 				padding: 0 1rem;
+				margin-top: 1rem;
 			}
-			.header{
-				display: flex;
-				justify-content: space-between;
-				padding: 1rem 2rem;
-				font-size: 1.4rem;
-				background-color: #D4D4D4;
+			.oper span{
+				font-size: 1.6rem;
+				margin: 0 1rem;
 			}
-			.btn{
+			.oper .btn{
 				width: 12rem;
 				height: 4rem;
 				margin: 0 1rem;
 				color: #FFFFFF;
 				background-color: #3399FF;
 				border: none;
+				border-radius: 1rem;
 				cursor: pointer;
+			}
+			.oper .text{
+				box-sizing: border-box;
+				width: 60px;
+				height: 4rem;
+				margin: 0 1rem;
+				border: 0.2rem solid #B2B2B2;
+				border-radius: 1rem;
+				text-align: center;
 			}
 			.table{
 				padding: 2rem;
 				overflow: auto;
+			}
+			.table .cu{
+				font-size: 1.2rem;
+				color: #3399FF;
+				font-weight: bold;
+			}
+			.table .cd{
+				font-size: 1.2rem;
+				color: #EE5555;
+				font-weight: bold;
+			}
+			.table .hint{
+				font-size: 1.6rem;
+				margin-bottom: 1rem;
+			}
+			.catchbox{
+				position: fixed;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				background-color: rgba(0, 0, 0, 0.4);
+			}
+			.catchbox .close{
+				display: block;
+				position: absolute;
+				top: 2rem;
+				right: 2rem;
+				padding: 1rem;
+				width: 4rem;
+				height: 4rem;
+				line-height: 4rem;
+				text-align: center;
+				font-size: 4rem;
+				color: #FFFFFF;
+				cursor: pointer;
+			}
+			.catchbox .con{
+				width: 50%;
+				height: 100%;
+				background-color: #FFFFFF;
+				overflow: auto;
+			}
+			.catchbox .add{
+				margin: 1rem;
+				padding: 1rem;
+				font-size: 1.6rem;
+				color: #3399FF;
+				border: 0.2rem dashed #3399FF;
+				text-align: center;
+				border-radius: 1rem;
+				cursor: pointer;
+			}
+			.catchbox .dd{
+				display: flex;
+				padding: 1rem;
+				padding-left: 0;
+				border-bottom: 1px solid #D4D4D4;
+				font-size: 1.6rem;
+				word-break: break-all;
+			}
+			.catchbox .dd i{
+				padding: 0 1rem;
+				cursor: pointer;
+			}
+			.catchbox .dd i.w{
+				color: #EE5555;
+			}
+			.catchbox .dd i.i{
+				color: #3399FF;
+			}
+			.catchbox .dd span{
+				flex: 1;
 			}
 		</style>
 	</head>
@@ -86,8 +182,24 @@
 				data:{
 					input:'',
 					output:[],
+					flag:'25',
+					finish:false,
 					sort:'dsd',
 					copytext:'',
+					iscopy:false,
+					dis:{
+						show:false,
+						input:'',
+						output:[],
+						flag:'25',
+						finish:false,
+					},
+					catchdata:{
+						model:null,
+						type:null,
+						show:false,
+						list:[],
+					},
 				},
 				computed:{
 					omit(){
@@ -120,10 +232,10 @@
 						return function(v){
 							let color='';
 							if(v==this.maxqty){
-								color='#add6ff';
+								color='#3399FF';
 							};
 							if(v<this.maxqty-6){
-								color='#f8bbbb';
+								color='#EE5555';
 							};
 							return color;
 						};
@@ -132,10 +244,10 @@
 						return function(v){
 							let color='';
 							if(v<=10){
-								color='#add6ff';
+								color='#3399FF';
 							};
 							if(v==this.output.length){
-								color='#f8bbbb';
+								color='#EE5555';
 							};
 							return color;
 						};
@@ -144,23 +256,23 @@
 						return function(v,n){
 							let num=0;
 							let color='';
-							if(v=='#add6ff'){
+							if(v=='#3399FF'){
 								num++;
 							};
-							if(v=='#f8bbbb'){
+							if(v=='#EE5555'){
 								num--;
 							};
-							if(n=='#add6ff'){
+							if(n=='#3399FF'){
 								num++;
 							};
-							if(n=='#f8bbbb'){
+							if(n=='#EE5555'){
 								num--;
 							};
 							if(num>0){
-								color='#add6ff';
+								color='#3399FF';
 							};
 							if(num<0){
-								color='#f8bbbb';
+								color='#EE5555';
 							};
 							return color;
 						};
@@ -170,19 +282,43 @@
 					<div>
 						<div class="header">
 							<span>tt2raid</span>
-							<span>V0.0.12</span>
+							<span>V0.0.13</span>
 						</div>
-						<div class="inputbox">
+						<div class="inputbox" v-if="false">
 							<textarea class="input" v-model="input" placeholder="输入从游戏中导出的数据：部落->资讯->前次突袭->复制"></textarea>
 						</div>
 						<div class="oper">
-							<button class="btn" v-on:click="start">处理</button>
-							<button class="btn" v-on:click="copy">复制</button>
+							<span>生成统计数据</span>
+							<button class="btn" v-on:click="start">从游戏导入</button>
+							<button class="btn" v-on:click="inp_start">从表格导入</button>
+							<button class="btn" v-on:click="catch_show('get','inp')">从缓存里取</button>
+							<button class="btn" v-if="finish" v-on:click="copy">复制</button>
+						</div>
+						<div class="oper">
+							<span>开突袭时士气</span>
+							<input class="text" v-model="flag">
+						</div>
+						<div class="oper" v-if="finish">
+							<span>生成对比数据</span>
+							<button class="btn" v-on:click="dis_start">从表格导入</button>
+							<button class="btn" v-on:click="catch_show('get','dis')">从缓存里取</button>
+						</div>
+						<div class="oper">
+							<span>其他</span>
+							<button class="btn" v-on:click="catch_show('set')">缓存管理</button>
+						</div>
+						<div class="inputbox" v-if="false&&dis.show">
+							<textarea class="input" v-model="dis.input" placeholder="输入对比数据，来源是上一次统计后点复制出来的数据"></textarea>
+						</div>
+						<div class="oper" v-if="false&&dis.show">
+							<button class="btn" v-on:click="dis_start">处理</button>
 						</div>
 						<div class="table">
-							<table ref="table">
+							<div class="hint">* 请及时将需要保存的数据复制粘贴到excel中保存</div>
+							<table>
 								<tr>
 									<th>名字</th>
+									<th>id</th>
 									<th>次数</th>
 									<th>总伤(M)</th>
 									<th class="cp" v-bind:class="{im:sort=='dsu'||sort=='dsd'}" v-on:click="dschange">排名 <span v-if="sort=='dsu'">▼</span><span v-else>▲</span></th>
@@ -191,12 +327,53 @@
 									<th>汇总</th>
 								</tr>
 								<tr v-for="(item,index) in output">
-									<td v-if="false"><font v-bind:color="ncolor(qcolor(item.qty),dcolor(item.dmgrank))">{{item.name}}</font></td>
-									<td v-if="false"><font v-bind:color="qcolor(item.qty)">{{item.qty}}</font></td>
-									<td v-if="false"><font v-bind:color="dcolor(item.dmgrank)">{{omit(item.dmg)}}</font></td>
-									<td v-bind:bgcolor="ncolor(qcolor(item.qty),dcolor(item.dmgrank))">{{item.name}}</td>
-									<td v-bind:bgcolor="qcolor(item.qty)">{{item.qty}}</td>
-									<td v-bind:bgcolor="dcolor(item.dmgrank)">{{omit(item.dmg)}}</td>
+									<td><font v-bind:color="ncolor(qcolor(item.qty),dcolor(item.dmgrank))">{{item.name}}</font></td>
+									<td>{{item.id}}</font></td>
+									<td><font v-bind:color="qcolor(item.qty)">{{item.qty}}</font></td>
+									<td><font v-bind:color="dcolor(item.dmgrank)">{{omit(item.dmg)}}</font></td>
+									<td>
+										{{item.dmgrank}}
+										<span class="cu" v-if="!!item.pdmgrank&&item.pdmgrank>item.dmgrank"> ↑{{item.pdmgrank-item.dmgrank}}</span>
+										<span class="cd" v-if="!!item.pdmgrank&&item.pdmgrank<item.dmgrank"> ↓{{item.dmgrank-item.pdmgrank}}</span>
+									</td>
+									<td>{{omit(item.avg)}}</td>
+									<td>
+										{{item.avgrank}}
+										<span class="cu" v-if="!!item.pavgrank&&item.pavgrank>item.avgrank"> ↑{{item.pavgrank-item.avgrank}}</span>
+										<span class="cd" v-if="!!item.pavgrank&&item.pavgrank<item.avgrank"> ↓{{item.avgrank-item.pavgrank}}</span>
+									</td>
+									<td>
+										<span v-if="index==0">人数</span>
+										<span v-if="index==1">{{output.length}}</span>
+										<span v-if="index==2">次数</span>
+										<span v-if="index==3">{{maxqty}}</span>
+										<span v-if="index==4">均总伤(M)</span>
+										<span v-if="index==5">{{omit(admg)}}</span>
+										<span v-if="index==6">均均伤(M)</span>
+										<span v-if="index==7">{{omit(aavg)}}</span>
+										<span v-if="index==8">满伤比</span>
+										<span v-if="index==9">{{(omit(admg)/maxqty/omit(aavg)).toFixed(2)}}</span>
+										<span v-if="index==10">旗子</span>
+										<span v-if="index==11">{{flag}}</span>
+									</td>
+								</tr>
+							</table>
+							<table ref="table" v-show="iscopy">
+								<tr>
+									<th>名字</th>
+									<th>id</th>
+									<th>次数</th>
+									<th>总伤(M)</th>
+									<th>排名</th>
+									<th>均伤(M)</th>
+									<th>排名</th>
+									<th>汇总</th>
+								</tr>
+								<tr v-for="(item,index) in output">
+									<td><font v-bind:color="ncolor(qcolor(item.qty),dcolor(item.dmgrank))">{{item.name}}</font></td>
+									<td>{{item.id}}</font></td>
+									<td><font v-bind:color="qcolor(item.qty)">{{item.qty}}</font></td>
+									<td><font v-bind:color="dcolor(item.dmgrank)">{{omit(item.dmg)}}</font></td>
 									<td>{{item.dmgrank}}</td>
 									<td>{{omit(item.avg)}}</td>
 									<td>{{item.avgrank}}</td>
@@ -211,16 +388,34 @@
 										<span v-if="index==7">{{omit(aavg)}}</span>
 										<span v-if="index==8">满伤比</span>
 										<span v-if="index==9">{{(omit(admg)/maxqty/omit(aavg)).toFixed(2)}}</span>
+										<span v-if="index==10">旗子</span>
+										<span v-if="index==11">{{flag}}</span>
 									</td>
 								</tr>
 							</table>
+						</div>
+						<div class="catchbox" v-if="catchdata.show">
+							<i class="close" v-on:click="catchdata.show=false">✕</i>
+							<div class="con">
+								<div class="add" v-if="finish" v-on:click="catch_add">+ 保存当前数据</div>
+								<div class="dd" v-for="(item,index) of catchdata.list">
+									<i class="w" v-if="catchdata.model=='set'" v-on:click="catch_del(index,item)">✕</i>
+									<i class="i" v-if="catchdata.model=='get'" v-on:click="catch_get(index,item)">✓</i>
+									<span>{{item.time}}</span>
+								</div>
+							</div>
 						</div>
 					</div>
 				`,
 				methods: {
 					start() {
+						let input=prompt("输入从游戏中导出的数据：部落->资讯->前次突袭->复制");
+						if(!!!input){
+							return false;
+						};
+						this.sort='dsd';
 						this.output=[];
-						let input_td=this.input.split('\n');
+						let input_td=input.split(' ');
 						let input_th=input_td.shift();
 						let totaldmg_json={};
 						for(let item of input_td){
@@ -257,6 +452,9 @@
 						for(let index in this.output){
 							this.output[index].dmgrank=parseInt(index)+1;
 						};
+						if(this.output.length>0){
+							this.finish=true;
+						};
 					},
 					dschange(){
 						if(this.sort=='dsd'){
@@ -285,19 +483,164 @@
 						};
 					},
 					copy(){
-						window.getSelection().removeAllRanges();
-						let clipboard = navigator.clipboard;
-						let temp = document.createElement("div");
-						temp.innerHTML = this.$refs.table.outerHTML;
-						temp.innerHTML=temp.innerHTML.replace(/▲/g,"").replace(/▼/g,"");
-						document.body.appendChild(temp);
-						let range = document.createRange();
-						range.selectNode(temp);
-						window.getSelection().addRange(range);
-						document.execCommand("copy");
-						document.body.removeChild(temp);
-						window.getSelection().removeAllRanges();
+						this.iscopy=true;
+						setTimeout(()=>{
+							window.getSelection().removeAllRanges();
+							let range = document.createRange();
+							range.selectNode(this.$refs.table);
+							window.getSelection().addRange(range);
+							document.execCommand("copy");
+							window.getSelection().removeAllRanges();
+							this.iscopy=false;
+							alert('复制了');
+						},0);
 					},
+					copy2(){
+						// 获取表格元素
+						let table = this.$refs.table;
+						// 获取表格行数和列数
+						let rows = table.rows.length;
+						let cols = table.rows[0].cells.length;
+						// 拼接表格数据
+						let data = "";
+						for (let i = 0; i < rows; i++) {
+							for (let j = 0; j < cols; j++) {
+								// 获取单元格内容
+								let cell = table.rows[i].cells[j].innerText;
+								// 添加制表符和换行符
+								data += cell + (j < cols - 1 ? "\t" : "\n");
+							}
+						}
+						// 调用navigator.clipboard.writeText()方法，将拼接好的数据写入到剪贴板中
+						navigator.clipboard.writeText(data).then(
+							function () {
+								// 复制成功时执行的回调函数
+								alert("复制成功");
+							},
+							function (err) {
+								// 复制失败时执行的回调函数
+								alert("复制失败: ", err);
+							}
+						);
+					},
+					inp_start(){
+						let input=prompt("输入从表格中复制的数据，来源是之前点复制按钮出来的数据");
+						if(!!!input){
+							return false;
+						};
+						this.sort='dsd';
+						this.output=[];
+						let input_td=input.split(' ');
+						let input_th=input_td.shift();
+						for(let i in input_td){
+							let arr=input_td[i].split('\t');
+							if(arr.length>1){
+								if(i==11){
+									this.flag=arr[7];
+								};
+								this.output.push({
+									id:arr[1],
+									name:arr[0],
+									qty:parseInt(arr[2]),
+									dmg:parseInt(arr[3])*1000000,
+									dmgrank:parseInt(arr[4]),
+									avg:parseInt(arr[5])*1000000,
+									avgrank:parseInt(arr[6]),
+								});
+							};
+						};
+						this.finish=true;
+					},
+					dis_start(){
+						let input=prompt("输入对比数据，来源是之前点复制按钮出来的数据");
+						if(!!!input){
+							return false;
+						};
+						let input_td=input.split(' ');
+						let input_th=input_td.shift();
+						let disoutput=this.output;
+						for(let i in input_td){
+							let arr=input_td[i].split('\t');
+							if(arr.length>1){
+								if(i==11){
+									this.dis.flag=arr[7];
+								};
+								let player=disoutput.find((v)=>{return v.id==arr[1]});
+								if(!!player){
+									player.pdmg=parseInt(arr[3])*1000000;
+									player.pdmgrank=parseInt(arr[4]);
+									player.pavg=parseInt(arr[5])*1000000;
+									player.pavgrank=parseInt(arr[6]);
+								};
+							};
+						};
+						this.output=[];
+						this.output=disoutput;
+					},
+					catch_show(model,type){
+						this.catchdata.model=model;
+						this.catchdata.type=type;
+						this.catchdata.show=true;
+					},
+					catch_add(){
+						for(let item of this.output){
+							item.pdmg=undefined;
+							item.pdmgrank=undefined;
+							item.pavg=undefined;
+							item.pavgrank=undefined;
+						};
+						this.catchdata.list.unshift({
+							time:JSON.stringify(new Date()).replace(/\"/g, "").replace(/T/g, " ").replace(/Z/g, ""),
+							text:JSON.stringify(this.output),
+							flag:this.flag,
+						});
+						localStorage.setItem('catchdata',JSON.stringify(this.catchdata.list));
+					},
+					catch_del(v,n){
+						let bool=confirm('确定要删除'+n.time+'这条记录么？');
+						if(bool){
+							this.catchdata.list.splice(v, 1);
+						};
+						localStorage.setItem('catchdata',JSON.stringify(this.catchdata.list));
+					},
+					catch_get(v,n){
+						switch(this.catchdata.type){
+							case 'inp' :
+							this.output=JSON.parse(n.text);
+							this.flag=n.flag;
+							this.finish=true;
+							this.catchdata.show=false;
+							break;
+							case 'dis' :
+							let input=JSON.parse(n.text);
+							for(let item of input){
+								let player=this.output.find((v)=>{return v.id==item.id});
+								if(!!player){
+									player.pdmg=item.dmg;
+									player.pdmgrank=item.dmgrank;
+									player.pavg=item.avg;
+									player.pavgrank=item.avgrank;
+								};
+							};
+							this.dis.flag=n.flag;
+							this.catchdata.show=false;
+							break;
+							default:
+							alert('异常操作');
+						};
+					},
+				},
+				mounted(){
+					let c;
+					try{
+						c=JSON.parse(localStorage.getItem('catchdata'));
+					}catch(e){
+						c=[];
+					}
+					if(!!!c){
+						c=[];
+					};
+					this.catchdata.list=c;
 				},
 			});
 		</script>
