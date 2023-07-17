@@ -32,6 +32,15 @@
 				font-size: 1.6rem;
 				white-space: nowrap;
 			}
+			button{
+				border: 1px solid #D4D4D4;
+				border-radius: 1rem;
+				cursor: pointer;
+			}
+			button.imp{
+				color: #FFFFFF;
+				background-color: #3399FF;
+			}
 			.header{
 				display: flex;
 				justify-content: space-between;
@@ -45,7 +54,7 @@
 			.input{
 				display: block;
 				width: calc(100% - 2.4rem);
-				height: 10rem;
+				height: 20rem;
 				padding: 1rem;
 				resize: none;
 				border: 0.2rem solid #B2B2B2;
@@ -66,27 +75,23 @@
 			th.im{
 				color: #3399FF;
 			}
-			.oper{
+			.control{
 				display: flex;
 				align-items: center;
 				padding: 0 1rem;
 				margin-top: 1rem;
 			}
-			.oper span{
+			.control span{
 				font-size: 1.6rem;
 				margin: 0 1rem;
+				white-space: nowrap;
 			}
-			.oper .btn{
+			.control .btn{
 				width: 12rem;
 				height: 4rem;
 				margin: 0 1rem;
-				color: #FFFFFF;
-				background-color: #3399FF;
-				border: none;
-				border-radius: 1rem;
-				cursor: pointer;
 			}
-			.oper .text{
+			.control .text{
 				box-sizing: border-box;
 				width: 60px;
 				height: 4rem;
@@ -124,8 +129,8 @@
 			.catchbox .close{
 				display: block;
 				position: absolute;
-				top: 2rem;
-				right: 2rem;
+				top: 1rem;
+				right: 1rem;
 				padding: 1rem;
 				width: 4rem;
 				height: 4rem;
@@ -172,6 +177,49 @@
 			.catchbox .dd span{
 				flex: 1;
 			}
+			.areabox{
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				position: fixed;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				background-color: rgba(0, 0, 0, 0.4);
+			}
+			.areabox .close{
+				display: block;
+				position: absolute;
+				top: 1rem;
+				right: 1rem;
+				padding: 1rem;
+				width: 4rem;
+				height: 4rem;
+				line-height: 4rem;
+				text-align: center;
+				font-size: 4rem;
+				color: #FFFFFF;
+				cursor: pointer;
+			}
+			.areabox .con{
+				width: 80%;
+				max-width: 50rem;
+				height: 80%;
+				max-height: 40rem;
+				background-color: #FFFFFF;
+				overflow: auto;
+				border-radius: 1rem;
+				overflow: auto;
+			}
+			.areabox .oper{
+				display: flex;
+				justify-content: space-around;
+			}
+			.areabox .oper .btn{
+				width: 12rem;
+				height: 4rem;
+			}
 		</style>
 	</head>
 	<body>
@@ -195,10 +243,16 @@
 						finish:false,
 					},
 					catchdata:{
+						show:false,
 						model:null,
 						type:null,
-						show:false,
 						list:[],
+					},
+					areabox:{
+						show:false,
+						type:null,
+						text:'',
+						hold:'',
 					},
 				},
 				computed:{
@@ -282,36 +336,27 @@
 					<div>
 						<div class="header">
 							<span>tt2raid</span>
-							<span>V0.0.13</span>
+							<span>V0.0.14</span>
 						</div>
-						<div class="inputbox" v-if="false">
-							<textarea class="input" v-model="input" placeholder="输入从游戏中导出的数据：部落->资讯->前次突袭->复制"></textarea>
+						<div class="control">
+							<span>统计数据</span>
+							<button class="btn imp" v-on:click="area_show('inp','输入从游戏中导出的数据：部落->资讯->前次突袭->复制')">游戏导入</button>
+							<button class="btn imp" v-on:click="area_show('tinp','输入从表格中复制的数据，来源是之前点复制按钮出来的数据')">表格导入</button>
+							<button class="btn imp" v-on:click="catch_show('get','inp')">缓存导入</button>
 						</div>
-						<div class="oper">
-							<span>生成统计数据</span>
-							<button class="btn" v-on:click="start">从游戏导入</button>
-							<button class="btn" v-on:click="inp_start">从表格导入</button>
-							<button class="btn" v-on:click="catch_show('get','inp')">从缓存里取</button>
-							<button class="btn" v-if="finish" v-on:click="copy">复制</button>
-						</div>
-						<div class="oper">
-							<span>开突袭时士气</span>
+						<div class="control">
+							<span>开突袭士气</span>
 							<input class="text" v-model="flag">
 						</div>
-						<div class="oper" v-if="finish">
-							<span>生成对比数据</span>
-							<button class="btn" v-on:click="dis_start">从表格导入</button>
-							<button class="btn" v-on:click="catch_show('get','dis')">从缓存里取</button>
+						<div class="control" v-if="finish">
+							<span>对比数据</span>
+							<button class="btn imp" v-on:click="area_show('tdis','输入对比数据，来源是之前点复制按钮出来的数据')">表格导入</button>
+							<button class="btn imp" v-on:click="catch_show('get','dis')">缓存导入</button>
 						</div>
-						<div class="oper">
+						<div class="control">
 							<span>其他</span>
-							<button class="btn" v-on:click="catch_show('set')">缓存管理</button>
-						</div>
-						<div class="inputbox" v-if="false&&dis.show">
-							<textarea class="input" v-model="dis.input" placeholder="输入对比数据，来源是上一次统计后点复制出来的数据"></textarea>
-						</div>
-						<div class="oper" v-if="false&&dis.show">
-							<button class="btn" v-on:click="dis_start">处理</button>
+							<button class="btn imp" v-if="finish" v-on:click="copy">复制</button>
+							<button class="btn imp" v-on:click="catch_show('set')">缓存管理</button>
 						</div>
 						<div class="table">
 							<div class="hint">* 请及时将需要保存的数据复制粘贴到excel中保存</div>
@@ -405,17 +450,25 @@
 								</div>
 							</div>
 						</div>
+						<div class="areabox" v-if="areabox.show">
+							<i class="close" v-on:click="areabox.show=false">✕</i>
+							<div class="con">
+								<div class="inputbox">
+									<textarea class="input" ref="input" v-model="areabox.text" v-bind:placeholder="areabox.hold"></textarea>
+								</div>
+								<div class="oper">
+									<button class="btn imp" v-on:click="areabox_sure">确定</button>
+								</div>
+							</div>
+						</div>
 					</div>
 				`,
 				methods: {
-					start() {
-						let input=prompt("输入从游戏中导出的数据：部落->资讯->前次突袭->复制");
-						if(!!!input){
-							return false;
-						};
+					start(input) {
 						this.sort='dsd';
 						this.output=[];
-						let input_td=input.split(' ');
+						this.input=input;
+						let input_td=input.split('\n');
 						let input_th=input_td.shift();
 						let totaldmg_json={};
 						for(let item of input_td){
@@ -523,14 +576,10 @@
 							}
 						);
 					},
-					inp_start(){
-						let input=prompt("输入从表格中复制的数据，来源是之前点复制按钮出来的数据");
-						if(!!!input){
-							return false;
-						};
+					inp_start(input){
 						this.sort='dsd';
 						this.output=[];
-						let input_td=input.split(' ');
+						let input_td=input.split('\n');
 						let input_th=input_td.shift();
 						for(let i in input_td){
 							let arr=input_td[i].split('\t');
@@ -551,12 +600,8 @@
 						};
 						this.finish=true;
 					},
-					dis_start(){
-						let input=prompt("输入对比数据，来源是之前点复制按钮出来的数据");
-						if(!!!input){
-							return false;
-						};
-						let input_td=input.split(' ');
+					dis_start(input){
+						let input_td=input.split('\n');
 						let input_th=input_td.shift();
 						let disoutput=this.output;
 						for(let i in input_td){
@@ -624,6 +669,36 @@
 							};
 							this.dis.flag=n.flag;
 							this.catchdata.show=false;
+							break;
+							default:
+							alert('异常操作');
+						};
+					},
+					area_show(type,hold){
+						this.areabox.type=type;
+						this.areabox.hold=hold;
+						this.areabox.text='';
+						this.areabox.show=true;
+						setTimeout(()=>{
+							this.$refs.input.focus();
+						},0);
+					},
+					areabox_sure(){
+						if(!!!this.areabox.text){
+							return false;
+						};
+						switch(this.areabox.type){
+							case 'inp' :
+							this.start(this.areabox.text);
+							this.areabox.show=false;
+							break;
+							case 'tinp' :
+							this.inp_start(this.areabox.text);
+							this.areabox.show=false;
+							break;
+							case 'tdis' :
+							this.dis_start(this.areabox.text);
+							this.areabox.show=false;
 							break;
 							default:
 							alert('异常操作');
