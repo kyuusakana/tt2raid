@@ -406,7 +406,7 @@
 					<div>
 						<div class="header">
 							<span>tt2raid</span>
-							<span>V0.0.15</span>
+							<span>V0.0.16</span>
 						</div>
 						<div class="control">
 							<span>统计数据</span>
@@ -571,7 +571,7 @@
 								name:totaldmg_json[index].name,
 								qty:totaldmg_json[index].qty,
 								dmg:totaldmg_json[index].dmg,
-								avg:totaldmg_json[index].dmg/totaldmg_json[index].qty,
+								avg:totaldmg_json[index].qty>0?totaldmg_json[index].dmg/totaldmg_json[index].qty:0,
 							});
 						};
 						this.output.sort(function (a,b){
