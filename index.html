@@ -22,7 +22,10 @@
 			input,button,textarea{ border: none; background: transparent; vertical-align:middle; outline: none; overflow: visible;
 				-webkit-user-select: auto;
 			}
-			table{border-collapse:collapse;border-spacing:0;}
+			table{
+				border-collapse:collapse;
+				border-spacing:0;
+			}
 			th{
 				text-align: left;
 			}
@@ -30,7 +33,7 @@
 				padding: 0.5rem 1rem;
 				border: 1px solid #D4D4D4;
 				font-size: 1.6rem;
-				white-space: nowrap;
+				background-color: #FFFFFF;
 			}
 			button{
 				border: 1px solid #D4D4D4;
@@ -40,6 +43,18 @@
 			button.imp{
 				color: #FFFFFF;
 				background-color: #3399FF;
+			}
+			.anitran1 *{
+				-webkit-transition: none;
+				-moz-transition: none;
+				-o-transition: none;
+				transition: none;
+			}
+			.anitran1{
+				-webkit-transition: all 0.1s ease-out;
+				-moz-transition: all 0.1s ease-out;
+				-o-transition: all 0.1s ease-out;
+				transition: all 0.1s ease-out;
 			}
 			.header{
 				display: flex;
@@ -100,9 +115,33 @@
 				border-radius: 1rem;
 				text-align: center;
 			}
+			.tablebox{
+				position: relative;
+			}
 			.table{
-				padding: 2rem;
+				margin: 0 2rem;
 				overflow: auto;
+			}
+			.table table{
+				/* table-layout: fixed; */
+			}
+			.table.poa{
+				position: absolute;
+			}
+			.table.poa table{
+				table-layout: fixed;
+				width: 12rem;
+			}
+			.table.poa2{
+				position: fixed;
+				top: 0;
+				left: 0;
+			}
+			.table .poa2_2{
+				margin-left: calc(12rem - 1px);
+			}
+			.table.por{
+				margin-left: calc(14rem - 1px);
 			}
 			.table .cu{
 				font-size: 1.2rem;
@@ -114,7 +153,31 @@
 				color: #EE5555;
 				font-weight: bold;
 			}
-			.table .hint{
+			.table .ns{
+				opacity: 0;
+				/* width: 12rem; */
+			}
+			.table th{
+				background-color: #F6F6F6;
+			}
+			.table th,.table td{
+				white-space: nowrap;
+				height: 3rem;
+			}
+			.table th.ns,.table td.ns{
+				/* width: 12rem; */
+			}
+			.table td{
+				/* word-break: break-all; */
+			}
+			.table.poa th,.table.poa td{
+				overflow: hidden;
+				white-space: nowrap;
+				text-overflow: ellipsis;
+			}
+			.hint{
+				margin-top: 1rem;
+				padding: 0 2rem;
 				font-size: 1.6rem;
 				margin-bottom: 1rem;
 			}
@@ -254,6 +317,13 @@
 						text:'',
 						hold:'',
 					},
+					pageobs:null,
+					poa2:{
+						show:false,
+						th2:{
+							transform: 'translateY(0rem)',
+						},
+					},
 				},
 				computed:{
 					omit(){
@@ -336,7 +406,7 @@
 					<div>
 						<div class="header">
 							<span>tt2raid</span>
-							<span>V0.0.14</span>
+							<span>V0.0.15</span>
 						</div>
 						<div class="control">
 							<span>统计数据</span>
@@ -358,86 +428,97 @@
 							<button class="btn imp" v-if="finish" v-on:click="copy">复制</button>
 							<button class="btn imp" v-on:click="catch_show('set')">缓存管理</button>
 						</div>
-						<div class="table">
-							<div class="hint">* 请及时将需要保存的数据复制粘贴到excel中保存</div>
-							<table>
-								<tr>
-									<th>名字</th>
-									<th>id</th>
-									<th>次数</th>
-									<th>总伤(M)</th>
-									<th class="cp" v-bind:class="{im:sort=='dsu'||sort=='dsd'}" v-on:click="dschange">排名 <span v-if="sort=='dsu'">▼</span><span v-else>▲</span></th>
-									<th>均伤(M)</th>
-									<th class="cp" v-bind:class="{im:sort=='asu'||sort=='asd'}" v-on:click="aschange">排名 <span v-if="sort=='asu'">▼</span><span v-else>▲</span></th>
-									<th>汇总</th>
-								</tr>
-								<tr v-for="(item,index) in output">
-									<td><font v-bind:color="ncolor(qcolor(item.qty),dcolor(item.dmgrank))">{{item.name}}</font></td>
-									<td>{{item.id}}</font></td>
-									<td><font v-bind:color="qcolor(item.qty)">{{item.qty}}</font></td>
-									<td><font v-bind:color="dcolor(item.dmgrank)">{{omit(item.dmg)}}</font></td>
-									<td>
-										{{item.dmgrank}}
-										<span class="cu" v-if="!!item.pdmgrank&&item.pdmgrank>item.dmgrank"> ↑{{item.pdmgrank-item.dmgrank}}</span>
-										<span class="cd" v-if="!!item.pdmgrank&&item.pdmgrank<item.dmgrank"> ↓{{item.dmgrank-item.pdmgrank}}</span>
-									</td>
-									<td>{{omit(item.avg)}}</td>
-									<td>
-										{{item.avgrank}}
-										<span class="cu" v-if="!!item.pavgrank&&item.pavgrank>item.avgrank"> ↑{{item.pavgrank-item.avgrank}}</span>
-										<span class="cd" v-if="!!item.pavgrank&&item.pavgrank<item.avgrank"> ↓{{item.avgrank-item.pavgrank}}</span>
-									</td>
-									<td>
-										<span v-if="index==0">人数</span>
-										<span v-if="index==1">{{output.length}}</span>
-										<span v-if="index==2">次数</span>
-										<span v-if="index==3">{{maxqty}}</span>
-										<span v-if="index==4">均总伤(M)</span>
-										<span v-if="index==5">{{omit(admg)}}</span>
-										<span v-if="index==6">均均伤(M)</span>
-										<span v-if="index==7">{{omit(aavg)}}</span>
-										<span v-if="index==8">满伤比</span>
-										<span v-if="index==9">{{(omit(admg)/maxqty/omit(aavg)).toFixed(2)}}</span>
-										<span v-if="index==10">旗子</span>
-										<span v-if="index==11">{{flag}}</span>
-									</td>
-								</tr>
-							</table>
-							<table ref="table" v-show="iscopy">
-								<tr>
-									<th>名字</th>
-									<th>id</th>
-									<th>次数</th>
-									<th>总伤(M)</th>
-									<th>排名</th>
-									<th>均伤(M)</th>
-									<th>排名</th>
-									<th>汇总</th>
-								</tr>
-								<tr v-for="(item,index) in output">
-									<td><font v-bind:color="ncolor(qcolor(item.qty),dcolor(item.dmgrank))">{{item.name}}</font></td>
-									<td>{{item.id}}</font></td>
-									<td><font v-bind:color="qcolor(item.qty)">{{item.qty}}</font></td>
-									<td><font v-bind:color="dcolor(item.dmgrank)">{{omit(item.dmg)}}</font></td>
-									<td>{{item.dmgrank}}</td>
-									<td>{{omit(item.avg)}}</td>
-									<td>{{item.avgrank}}</td>
-									<td>
-										<span v-if="index==0">人数</span>
-										<span v-if="index==1">{{output.length}}</span>
-										<span v-if="index==2">次数</span>
-										<span v-if="index==3">{{maxqty}}</span>
-										<span v-if="index==4">均总伤(M)</span>
-										<span v-if="index==5">{{omit(admg)}}</span>
-										<span v-if="index==6">均均伤(M)</span>
-										<span v-if="index==7">{{omit(aavg)}}</span>
-										<span v-if="index==8">满伤比</span>
-										<span v-if="index==9">{{(omit(admg)/maxqty/omit(aavg)).toFixed(2)}}</span>
-										<span v-if="index==10">旗子</span>
-										<span v-if="index==11">{{flag}}</span>
-									</td>
-								</tr>
-							</table>
+						<div class="hint">* 请及时将需要保存的数据复制粘贴到excel中保存</div>
+						<div></div>
+						<div class="tablebox">
+							<div class="table poa">
+								<table>
+									<tr class="th1" ref="tabletd">
+										<th class="anitran1" v-bind:style="poa2.th2">名字</th>
+									</tr>
+									<tr v-for="(item,index) in output">
+										<td><font v-bind:color="ncolor(qcolor(item.qty),dcolor(item.dmgrank))">{{item.name}}</font></td>
+									</tr>
+								</table>
+							</div>
+							<div class="table por">
+								<table>
+									<tr class="anitran1" v-bind:style="poa2.th2">
+										<th>id</th>
+										<th>次数</th>
+										<th>总伤(M)</th>
+										<th class="cp" v-bind:class="{im:sort=='dsu'||sort=='dsd'}" v-on:click="dschange">排名 <span v-if="sort=='dsu'">▼</span><span v-else>▲</span></th>
+										<th>均伤(M)</th>
+										<th class="cp" v-bind:class="{im:sort=='asu'||sort=='asd'}" v-on:click="aschange">排名 <span v-if="sort=='asu'">▼</span><span v-else>▲</span></th>
+										<th>汇总</th>
+									</tr>
+									<tr ref="poa2top" v-for="(item,index) in output">
+										<td>{{item.id}}</font></td>
+										<td><font v-bind:color="qcolor(item.qty)">{{item.qty}}</font></td>
+										<td><font v-bind:color="dcolor(item.dmgrank)">{{omit(item.dmg)}}</font></td>
+										<td>
+											{{item.dmgrank}}
+											<span class="cu" v-if="!!item.pdmgrank&&item.pdmgrank>item.dmgrank"> ↑{{item.pdmgrank-item.dmgrank}}</span>
+											<span class="cd" v-if="!!item.pdmgrank&&item.pdmgrank<item.dmgrank"> ↓{{item.dmgrank-item.pdmgrank}}</span>
+										</td>
+										<td>{{omit(item.avg)}}</td>
+										<td>
+											{{item.avgrank}}
+											<span class="cu" v-if="!!item.pavgrank&&item.pavgrank>item.avgrank"> ↑{{item.pavgrank-item.avgrank}}</span>
+											<span class="cd" v-if="!!item.pavgrank&&item.pavgrank<item.avgrank"> ↓{{item.avgrank-item.pavgrank}}</span>
+										</td>
+										<td>
+											<span v-if="index==0">人数</span>
+											<span v-if="index==1">{{output.length}}</span>
+											<span v-if="index==2">次数</span>
+											<span v-if="index==3">{{maxqty}}</span>
+											<span v-if="index==4">均总伤(M)</span>
+											<span v-if="index==5">{{omit(admg)}}</span>
+											<span v-if="index==6">均均伤(M)</span>
+											<span v-if="index==7">{{omit(aavg)}}</span>
+											<span v-if="index==8">满伤比</span>
+											<span v-if="index==9">{{(omit(admg)/maxqty/omit(aavg)).toFixed(2)}}</span>
+											<span v-if="index==10">旗子</span>
+											<span v-if="index==11">{{flag}}</span>
+										</td>
+									</tr>
+								</table>
+								<table ref="table" v-show="iscopy">
+									<tr>
+										<th>名字</th>
+										<th>id</th>
+										<th>次数</th>
+										<th>总伤(M)</th>
+										<th>排名</th>
+										<th>均伤(M)</th>
+										<th>排名</th>
+										<th>汇总</th>
+									</tr>
+									<tr v-for="(item,index) in output">
+										<td><font v-bind:color="ncolor(qcolor(item.qty),dcolor(item.dmgrank))">{{item.name}}</font></td>
+										<td>{{item.id}}</font></td>
+										<td><font v-bind:color="qcolor(item.qty)">{{item.qty}}</font></td>
+										<td><font v-bind:color="dcolor(item.dmgrank)">{{omit(item.dmg)}}</font></td>
+										<td>{{item.dmgrank}}</td>
+										<td>{{omit(item.avg)}}</td>
+										<td>{{item.avgrank}}</td>
+										<td>
+											<span v-if="index==0">人数</span>
+											<span v-if="index==1">{{output.length}}</span>
+											<span v-if="index==2">次数</span>
+											<span v-if="index==3">{{maxqty}}</span>
+											<span v-if="index==4">均总伤(M)</span>
+											<span v-if="index==5">{{omit(admg)}}</span>
+											<span v-if="index==6">均均伤(M)</span>
+											<span v-if="index==7">{{omit(aavg)}}</span>
+											<span v-if="index==8">满伤比</span>
+											<span v-if="index==9">{{(omit(admg)/maxqty/omit(aavg)).toFixed(2)}}</span>
+											<span v-if="index==10">旗子</span>
+											<span v-if="index==11">{{flag}}</span>
+										</td>
+									</tr>
+								</table>
+							</div>
 						</div>
 						<div class="catchbox" v-if="catchdata.show">
 							<i class="close" v-on:click="catchdata.show=false">✕</i>
@@ -716,6 +797,25 @@
 						c=[];
 					};
 					this.catchdata.list=c;
+					this.pageobs = new IntersectionObserver((entries, observer) => { 
+						entries.forEach(entry => {
+							if (entry.isIntersecting) { //true表示从不可视状态变为可视状态
+								this.poa2.show=false;
+							}else{
+								this.poa2.show=true;
+							};
+						}) 
+					}, {}); 
+					this.pageobs.observe(this.$refs.tabletd);
+					window.document.onscroll=()=>{
+						let thh=this.$refs.poa2top[0].clientHeight;
+						let top=this.$refs.poa2top[0].getBoundingClientRect().top;
+						if(this.poa2.show){
+							this.poa2.th2.transform='translateY('+(thh-1-top)+'px)';
+						}else{
+							this.poa2.th2.transform='translateY(0)';
+						};
+					};
 				},
 			});
 		</script>
