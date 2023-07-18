@@ -44,6 +44,24 @@
 				color: #FFFFFF;
 				background-color: #3399FF;
 			}
+			.anisn{
+				-webkit-touch-callout:none;
+				-webkit-user-select:none;
+				-khtml-user-select:none;
+				-moz-user-select:none;
+				-ms-user-select:none;
+				user-select:none;
+				-o-user-select:none;
+			}
+			.anisa{
+				-webkit-touch-callout:text;
+				-webkit-user-select:text;
+				-khtml-user-select:text;
+				-moz-user-select:text;
+				-ms-user-select:text;
+				user-select:text;
+				-moz-user-select:text;
+			}
 			.anitran1 *{
 				-webkit-transition: none;
 				-moz-transition: none;
@@ -283,6 +301,22 @@
 				width: 12rem;
 				height: 4rem;
 			}
+			.floatbtn{
+				position: absolute;
+				right: 1rem;
+				bottom: 1rem;
+			}
+			.floatbtn .stand{
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				width: 6rem;
+				height: 6rem;
+				font-size: 1.2rem;
+				color: #FFFFFF;
+				background-color: #3399FF;
+				border-radius: 3rem;
+			}
 		</style>
 	</head>
 	<body>
@@ -403,16 +437,16 @@
 					},
 				},
 				template:`
-					<div>
+					<div class="anisn">
 						<div class="header">
 							<span>tt2raid</span>
-							<span>V0.0.16</span>
+							<span>V0.0.17</span>
 						</div>
 						<div class="control">
 							<span>统计数据</span>
-							<button class="btn imp" v-on:click="area_show('inp','输入从游戏中导出的数据：部落->资讯->前次突袭->复制')">游戏导入</button>
-							<button class="btn imp" v-on:click="area_show('tinp','输入从表格中复制的数据，来源是之前点复制按钮出来的数据')">表格导入</button>
-							<button class="btn imp" v-on:click="catch_show('get','inp')">缓存导入</button>
+							<button class="btn imp" v-on:click="area_show('inp','输入从游戏中导出的数据：部落->资讯->前次突袭->复制')">从游戏取</button>
+							<button class="btn imp" v-on:click="area_show('tinp','输入从表格中复制的数据，来源是之前点复制按钮出来的数据')">从表格取</button>
+							<button class="btn imp" v-on:click="catch_show('get','inp')">从缓存取</button>
 						</div>
 						<div class="control">
 							<span>开突袭士气</span>
@@ -420,20 +454,22 @@
 						</div>
 						<div class="control" v-if="finish">
 							<span>对比数据</span>
-							<button class="btn imp" v-on:click="area_show('tdis','输入对比数据，来源是之前点复制按钮出来的数据')">表格导入</button>
-							<button class="btn imp" v-on:click="catch_show('get','dis')">缓存导入</button>
+							<button class="btn imp" v-on:click="area_show('tdis','输入对比数据，来源是之前点复制按钮出来的数据')">从表格取</button>
+							<button class="btn imp" v-on:click="catch_show('get','dis')">从缓存取</button>
 						</div>
 						<div class="control">
 							<span>其他</span>
 							<button class="btn imp" v-if="finish" v-on:click="copy">复制</button>
 							<button class="btn imp" v-on:click="catch_show('set')">缓存管理</button>
+							<button class="btn" v-on:click="catch_in">导入缓存</button>
+							<button class="btn" v-on:click="catch_out">导出缓存</button>
 						</div>
 						<div class="hint">* 请及时将需要保存的数据复制粘贴到excel中保存</div>
-						<div></div>
+						<div ref="tabletd"></div>
 						<div class="tablebox">
 							<div class="table poa">
 								<table>
-									<tr class="th1" ref="tabletd">
+									<tr class="th1">
 										<th class="anitran1" v-bind:style="poa2.th2">名字</th>
 									</tr>
 									<tr v-for="(item,index) in output">
@@ -445,7 +481,7 @@
 								<table>
 									<tr class="anitran1" v-bind:style="poa2.th2">
 										<th>id</th>
-										<th>次数</th>
+										<th class="cp" v-bind:class="{im:sort=='qsu'||sort=='qsd'}" v-on:click="qschange">次数 <span v-if="sort=='qsu'">▲</span><span v-else>▼</span></th>
 										<th>总伤(M)</th>
 										<th class="cp" v-bind:class="{im:sort=='dsu'||sort=='dsd'}" v-on:click="dschange">排名 <span v-if="sort=='dsu'">▼</span><span v-else>▲</span></th>
 										<th>均伤(M)</th>
@@ -461,7 +497,11 @@
 											<span class="cu" v-if="!!item.pdmgrank&&item.pdmgrank>item.dmgrank"> ↑{{item.pdmgrank-item.dmgrank}}</span>
 											<span class="cd" v-if="!!item.pdmgrank&&item.pdmgrank<item.dmgrank"> ↓{{item.dmgrank-item.pdmgrank}}</span>
 										</td>
-										<td>{{omit(item.avg)}}</td>
+										<td>
+											{{omit(item.avg)}}
+											<span class="cu" v-if="!!item.pavg&&(item.pavg/(dis.flag/100+1.06)*(flag/100+1.06))<item.avg"> ↑{{omit(item.avg-(item.pavg/(dis.flag/100+1.06)*(flag/100+1.06)))}}</span>
+											<span class="cd" v-if="!!item.pavg&&(item.pavg/(dis.flag/100+1.06)*(flag/100+1.06))>item.avg"> ↓{{omit((item.pavg/(dis.flag/100+1.06)*(flag/100+1.06))-item.avg)}}</span>
+										</td>
 										<td>
 											{{item.avgrank}}
 											<span class="cu" v-if="!!item.pavgrank&&item.pavgrank>item.avgrank"> ↑{{item.pavgrank-item.avgrank}}</span>
@@ -562,7 +602,7 @@
 										dmg:0,
 									};
 								};
-								totaldmg_json[arr[1]].dmg+=parseInt(arr[5]);
+								totaldmg_json[arr[1]].dmg+=parseFloat(arr[5]);
 							};
 						};
 						for(let index in totaldmg_json){
@@ -588,6 +628,19 @@
 						};
 						if(this.output.length>0){
 							this.finish=true;
+						};
+					},
+					qschange(){
+						if(this.sort=='qsd'){
+							this.sort='qsu';
+							this.output.sort(function (a,b){
+								return a.qty-b.qty;
+							});
+						}else{
+							this.sort='qsd';
+							this.output.sort(function (a,b){
+								return b.qty-a.qty;
+							});
 						};
 					},
 					dschange(){
@@ -671,11 +724,11 @@
 								this.output.push({
 									id:arr[1],
 									name:arr[0],
-									qty:parseInt(arr[2]),
-									dmg:parseInt(arr[3])*1000000,
-									dmgrank:parseInt(arr[4]),
-									avg:parseInt(arr[5])*1000000,
-									avgrank:parseInt(arr[6]),
+									qty:parseFloat(arr[2]),
+									dmg:parseFloat(arr[3])*1000000,
+									dmgrank:parseFloat(arr[4]),
+									avg:parseFloat(arr[5])*1000000,
+									avgrank:parseFloat(arr[6]),
 								});
 							};
 						};
@@ -693,10 +746,10 @@
 								};
 								let player=disoutput.find((v)=>{return v.id==arr[1]});
 								if(!!player){
-									player.pdmg=parseInt(arr[3])*1000000;
-									player.pdmgrank=parseInt(arr[4]);
-									player.pavg=parseInt(arr[5])*1000000;
-									player.pavgrank=parseInt(arr[6]);
+									player.pdmg=parseFloat(arr[3])*1000000;
+									player.pdmgrank=parseFloat(arr[4]);
+									player.pavg=parseFloat(arr[5])*1000000;
+									player.pavgrank=parseFloat(arr[6]);
 								};
 							};
 						};
@@ -709,15 +762,21 @@
 						this.catchdata.show=true;
 					},
 					catch_add(){
+						let output=[];
 						for(let item of this.output){
-							item.pdmg=undefined;
-							item.pdmgrank=undefined;
-							item.pavg=undefined;
-							item.pavgrank=undefined;
+							output.push({
+								id:item.id,
+								name:item.name,
+								qty:item.qty,
+								dmg:item.dmg,
+								dmgrank:item.dmgrank,
+								avg:item.avg,
+								avgrank:item.avgrank,
+							});
 						};
 						this.catchdata.list.unshift({
 							time:JSON.stringify(new Date()).replace(/\"/g, "").replace(/T/g, " ").replace(/Z/g, ""),
-							text:JSON.stringify(this.output),
+							text:JSON.stringify(output),
 							flag:this.flag,
 						});
 						localStorage.setItem('catchdata',JSON.stringify(this.catchdata.list));
@@ -785,6 +844,41 @@
 							alert('异常操作');
 						};
 					},
+					catch_in(){
+						let file=document.createElement("input");
+						file.type="file";
+						file.accept=".txt";
+						file.onchange=()=>{
+							let reader = new FileReader();
+							reader.readAsText(file.files[0]);
+							reader.onload = (e) =>{
+								let list;
+								try{
+									list=JSON.parse(decodeURIComponent(atob(e.target.result)));
+								}catch(e){};
+								if(!!!list){
+									alert('数据异常');
+									return false;
+								};
+								this.catchdata.list=list;
+								localStorage.setItem('catchdata',JSON.stringify(this.catchdata.list));
+								alert('导入成功');
+							}
+						};
+						file.click();
+					},
+					catch_out(){
+						const stringData = btoa(encodeURIComponent(JSON.stringify(this.catchdata.list)));
+						const blob = new Blob([stringData], {
+							type: "text/plain;charset=utf-8"
+						});
+						const objectURL = URL.createObjectURL(blob);
+						const aTag = document.createElement('a');
+						aTag.href = objectURL;
+						aTag.download = 'tt2raid_catch_'+JSON.stringify(new Date()).replace(/\"/g, "").replace(/T/g, "_").replace(/:/g, "").replace(/\./g, "").replace(/Z/g, "").replace(/ /g, "")+'.txt';
+						aTag.click();
+						URL.revokeObjectURL(objectURL);
+					},
 				},
 				mounted(){
 					let c;
@@ -799,6 +893,7 @@
 					this.catchdata.list=c;
 					this.pageobs = new IntersectionObserver((entries, observer) => { 
 						entries.forEach(entry => {
+						console.log(entry.isIntersecting);
 							if (entry.isIntersecting) { //true表示从不可视状态变为可视状态
 								this.poa2.show=false;
 							}else{
