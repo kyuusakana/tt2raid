@@ -19,6 +19,9 @@
 			html,body{
 				margin: 0;
 			}
+			body{
+				background-color: #F6F6F6;
+			}
 			input,button,textarea{ border: none; background: transparent; vertical-align:middle; outline: none; overflow: visible;
 				-webkit-user-select: auto;
 			}
@@ -76,10 +79,58 @@
 			}
 			.header{
 				display: flex;
-				justify-content: space-between;
-				padding: 1rem 2rem;
+				align-items: center;
+				padding: 0 2rem;
 				font-size: 1.6rem;
 				background-color: #D4D4D4;
+			}
+			.header .title{
+				margin-right: 1rem;
+			}
+			.header .tab{
+				position: relative;
+				margin-top: 0.5rem;
+				padding: 0 1.5rem;
+				padding-top: 0.5rem;
+				padding-bottom: 1rem;
+				border-top-left-radius: 1rem;
+				border-top-right-radius: 1rem;
+				cursor: pointer;
+			}
+			.header .tab .b{
+				position: absolute;
+				bottom: 0;
+				width: 1rem;
+				height: 1rem;
+				background-color: #F6F6F6;
+				opacity: 0;
+			}
+			.header .tab .b.l{
+				left: -1rem;
+			}
+			.header .tab .b.r{
+				right: -1rem;
+			}
+			.header .tab .c{
+				display: block;
+				height: 100%;
+				background-color: #D4D4D4;
+			}
+			.header .tab.active{
+				background-color: #F6F6F6;
+				box-shadow: 0 -0.2rem 0.2rem rgba(0, 0, 0, 0.2);
+			}
+			.header .tab.active .b{
+				opacity: 1;
+			}
+			.header .tab.active .b.l .c{
+				border-bottom-right-radius: 1rem;
+			}
+			.header .tab.active .b.r .c{
+				border-bottom-left-radius: 1rem;
+			}
+			.header .blank{
+				flex: 1;
 			}
 			.inputbox{
 				padding: 2rem;
@@ -126,15 +177,26 @@
 			}
 			.control .text{
 				box-sizing: border-box;
-				width: 60px;
+				width: 100%;
 				height: 4rem;
+				padding: 0 0.5rem;
 				margin: 0 1rem;
 				border: 0.2rem solid #B2B2B2;
 				border-radius: 1rem;
-				text-align: center;
+			}
+			.control .text:focus{
+				border-color: #3399FF;
 			}
 			.tablebox{
 				position: relative;
+				margin-top: 2rem;
+				margin-bottom: 8rem;
+			}
+			.tablebox .blank{
+				margin-top: 2rem;
+				font-size: 1.6rem;
+				color: #999999;
+				text-align: center;
 			}
 			.table{
 				margin: 0 2rem;
@@ -199,6 +261,65 @@
 				font-size: 1.6rem;
 				margin-bottom: 1rem;
 			}
+			
+			.introcon .p{
+				margin-top: 2rem;
+				padding: 0 2rem;
+				font-size: 1.6rem;
+			}
+			
+			.catchcon{
+				padding: 0 2rem;
+			}
+			.catchcon .blank{
+				margin-top: 2rem;
+				font-size: 1.6rem;
+				color: #999999;
+				text-align: center;
+			}
+			.catchcon .dd{
+				display: flex;
+				padding: 1rem 0;
+				border-bottom: 1px solid #D4D4D4;
+			}
+			.catchcon .info{
+				flex: 1;
+			}
+			.catchcon .title{
+				font-size: 1.8rem;
+			}
+			.catchcon .more{
+				font-size: 1.4rem;
+				color: #999999;
+			}
+			.catchcon .oper{
+				display: flex;
+				align-items: center;
+			}
+			.catchcon .oper i{
+				display: block;
+				margin: -1rem 0;
+				padding: 1rem;
+				font-size: 2rem;
+				cursor: pointer;
+			}
+			.catchcon .oper i.w{
+				color: #EE5555;
+			}
+			
+			.initbox{
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				margin-top: 4rem;
+				font-size: 2.4rem;
+			}
+			.initbox button{
+				margin-top: 2rem;
+				padding: 1rem 2rem;
+				font-size: 1.6rem;
+			}
+			
 			.catchbox{
 				position: fixed;
 				top: 0;
@@ -206,6 +327,12 @@
 				right: 0;
 				bottom: 0;
 				background-color: rgba(0, 0, 0, 0.4);
+				opacity: 0;
+				pointer-events: none;
+			}
+			.catchbox.show{
+				opacity: 1;
+				pointer-events: all;
 			}
 			.catchbox .close{
 				display: block;
@@ -224,8 +351,12 @@
 			.catchbox .con{
 				width: 50%;
 				height: 100%;
+				margin-left: -50%;
 				background-color: #FFFFFF;
 				overflow: auto;
+			}
+			.catchbox .con.show{
+				margin-left: 0;
 			}
 			.catchbox .add{
 				margin: 1rem;
@@ -241,7 +372,7 @@
 				display: flex;
 				padding: 1rem;
 				padding-left: 0;
-				border-bottom: 1px solid #D4D4D4;
+				border-top: 1px solid #D4D4D4;
 				font-size: 1.6rem;
 				word-break: break-all;
 			}
@@ -258,6 +389,20 @@
 			.catchbox .dd span{
 				flex: 1;
 			}
+			.catchbox .dd.active{
+				color: #FFFFFF;
+				background-color: #3399FF;
+			}
+			.catchbox .dd.active i{
+				color: #FFFFFF;
+			}
+			.catchbox .end{
+				margin: 1rem 0;
+				font-size: 1.4rem;
+				color: #999999;
+				text-align: center;
+			}
+			
 			.areabox{
 				display: flex;
 				align-items: center;
@@ -301,21 +446,63 @@
 				width: 12rem;
 				height: 4rem;
 			}
+			
 			.floatbtn{
-				position: absolute;
-				right: 1rem;
-				bottom: 1rem;
+				position: fixed;
+				right: 2rem;
+				bottom: 2rem;
 			}
-			.floatbtn .stand{
+			.floatbtn.dis{
+				right: 10rem;
+			}
+			.floatbtn .lv1{
 				display: flex;
 				align-items: center;
 				justify-content: center;
+				position: relative;
 				width: 6rem;
 				height: 6rem;
 				font-size: 1.2rem;
 				color: #FFFFFF;
 				background-color: #3399FF;
 				border-radius: 3rem;
+				box-shadow: 0 0.3rem 0.3rem #D4D4D4;
+				cursor: pointer;
+			}
+			.floatbtn .lv2{
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				position: relative;
+				width: 4rem;
+				height: 4rem;
+				margin: 0 auto;
+				margin-bottom: -4rem;
+				font-size: 2rem;
+				background-color: #FFFFFF;
+				border-radius: 3rem;
+				box-shadow: 0 0.3rem 0.3rem #D4D4D4;
+			}
+			.floatbtn .lv2 span{
+				position: absolute;
+				left: -1rem;
+				right: -1rem;
+				bottom: -3rem;
+				width: 6rem;
+				padding: 0.4rem 0rem;
+				font-size: 1.2rem;
+				white-space: nowrap;
+				text-align: center;
+				background-color: rgba(255, 255, 255, 0.8);
+				opacity: 0;
+				border-radius: 2rem;
+				pointer-events: none;
+			}
+			.floatbtn.show .lv2{
+				margin-bottom: 4rem;
+			}
+			.floatbtn.show .lv2 span{
+				opacity: 1;
 			}
 		</style>
 	</head>
@@ -325,7 +512,8 @@
 			new Vue({
 				el:'app',
 				data:{
-					input:'',
+					title:'',
+					tab:'table',
 					output:[],
 					flag:'25',
 					finish:false,
@@ -334,16 +522,15 @@
 					iscopy:false,
 					dis:{
 						show:false,
-						input:'',
 						output:[],
 						flag:'25',
 						finish:false,
 					},
 					catchdata:{
 						show:false,
-						model:null,
 						type:null,
 						list:[],
+						item:null,
 					},
 					areabox:{
 						show:false,
@@ -358,6 +545,8 @@
 							transform: 'translateY(0rem)',
 						},
 					},
+					inpshow:false,
+					disshow:false,
 				},
 				computed:{
 					omit(){
@@ -439,136 +628,184 @@
 				template:`
 					<div class="anisn">
 						<div class="header">
-							<span>tt2raid</span>
-							<span>V0.0.17</span>
+							<span class="tab anitran1" v-bind:class="{active:tab=='table'}" v-on:click="tab='table'"><i class="b l anitran1"><i class="c"></i></i>表格<i class="b r anitran1"><i class="c"></i></i></span>
+							<span class="tab anitran1" v-bind:class="{active:tab=='record'}" v-on:click="tab='record'"><i class="b l anitran1"><i class="c"></i></i>记录<i class="b r anitran1"><i class="c"></i></i></span>
+							<span class="tab anitran1" v-bind:class="{active:tab=='intro'}" v-on:click="tab='intro'"><i class="b l anitran1"><i class="c"></i></i>说明<i class="b r anitran1"><i class="c"></i></i></span>
+							<span class="blank"></span>
+							<span>tt2raid V0.1.18</span>
 						</div>
-						<div class="control">
-							<span>统计数据</span>
-							<button class="btn imp" v-on:click="area_show('inp','输入从游戏中导出的数据：部落->资讯->前次突袭->复制')">从游戏取</button>
-							<button class="btn imp" v-on:click="area_show('tinp','输入从表格中复制的数据，来源是之前点复制按钮出来的数据')">从表格取</button>
-							<button class="btn imp" v-on:click="catch_show('get','inp')">从缓存取</button>
-						</div>
-						<div class="control">
-							<span>开突袭士气</span>
-							<input class="text" v-model="flag">
-						</div>
-						<div class="control" v-if="finish">
-							<span>对比数据</span>
-							<button class="btn imp" v-on:click="area_show('tdis','输入对比数据，来源是之前点复制按钮出来的数据')">从表格取</button>
-							<button class="btn imp" v-on:click="catch_show('get','dis')">从缓存取</button>
-						</div>
-						<div class="control">
-							<span>其他</span>
-							<button class="btn imp" v-if="finish" v-on:click="copy">复制</button>
-							<button class="btn imp" v-on:click="catch_show('set')">缓存管理</button>
-							<button class="btn" v-on:click="catch_in">导入缓存</button>
-							<button class="btn" v-on:click="catch_out">导出缓存</button>
-						</div>
-						<div class="hint">* 请及时将需要保存的数据复制粘贴到excel中保存</div>
-						<div ref="tabletd"></div>
-						<div class="tablebox">
-							<div class="table poa">
-								<table>
-									<tr class="th1">
-										<th class="anitran1" v-bind:style="poa2.th2">名字</th>
-									</tr>
-									<tr v-for="(item,index) in output">
-										<td><font v-bind:color="ncolor(qcolor(item.qty),dcolor(item.dmgrank))">{{item.name}}</font></td>
-									</tr>
-								</table>
+						<div v-if="tab=='table'">
+							<div class="control" v-if="!!catchdata.item">
+								<span>记录时间</span>
+								<span>{{catchdata.item.time}}</span>
 							</div>
-							<div class="table por">
-								<table>
-									<tr class="anitran1" v-bind:style="poa2.th2">
-										<th>id</th>
-										<th class="cp" v-bind:class="{im:sort=='qsu'||sort=='qsd'}" v-on:click="qschange">次数 <span v-if="sort=='qsu'">▲</span><span v-else>▼</span></th>
-										<th>总伤(M)</th>
-										<th class="cp" v-bind:class="{im:sort=='dsu'||sort=='dsd'}" v-on:click="dschange">排名 <span v-if="sort=='dsu'">▼</span><span v-else>▲</span></th>
-										<th>均伤(M)</th>
-										<th class="cp" v-bind:class="{im:sort=='asu'||sort=='asd'}" v-on:click="aschange">排名 <span v-if="sort=='asu'">▼</span><span v-else>▲</span></th>
-										<th>汇总</th>
-									</tr>
-									<tr ref="poa2top" v-for="(item,index) in output">
-										<td>{{item.id}}</font></td>
-										<td><font v-bind:color="qcolor(item.qty)">{{item.qty}}</font></td>
-										<td><font v-bind:color="dcolor(item.dmgrank)">{{omit(item.dmg)}}</font></td>
-										<td>
-											{{item.dmgrank}}
-											<span class="cu" v-if="!!item.pdmgrank&&item.pdmgrank>item.dmgrank"> ↑{{item.pdmgrank-item.dmgrank}}</span>
-											<span class="cd" v-if="!!item.pdmgrank&&item.pdmgrank<item.dmgrank"> ↓{{item.dmgrank-item.pdmgrank}}</span>
-										</td>
-										<td>
-											{{omit(item.avg)}}
-											<span class="cu" v-if="!!item.pavg&&(item.pavg/(dis.flag/100+1.06)*(flag/100+1.06))<item.avg"> ↑{{omit(item.avg-(item.pavg/(dis.flag/100+1.06)*(flag/100+1.06)))}}</span>
-											<span class="cd" v-if="!!item.pavg&&(item.pavg/(dis.flag/100+1.06)*(flag/100+1.06))>item.avg"> ↓{{omit((item.pavg/(dis.flag/100+1.06)*(flag/100+1.06))-item.avg)}}</span>
-										</td>
-										<td>
-											{{item.avgrank}}
-											<span class="cu" v-if="!!item.pavgrank&&item.pavgrank>item.avgrank"> ↑{{item.pavgrank-item.avgrank}}</span>
-											<span class="cd" v-if="!!item.pavgrank&&item.pavgrank<item.avgrank"> ↓{{item.avgrank-item.pavgrank}}</span>
-										</td>
-										<td>
-											<span v-if="index==0">人数</span>
-											<span v-if="index==1">{{output.length}}</span>
-											<span v-if="index==2">次数</span>
-											<span v-if="index==3">{{maxqty}}</span>
-											<span v-if="index==4">均总伤(M)</span>
-											<span v-if="index==5">{{omit(admg)}}</span>
-											<span v-if="index==6">均均伤(M)</span>
-											<span v-if="index==7">{{omit(aavg)}}</span>
-											<span v-if="index==8">满伤比</span>
-											<span v-if="index==9">{{(omit(admg)/maxqty/omit(aavg)).toFixed(2)}}</span>
-											<span v-if="index==10">旗子</span>
-											<span v-if="index==11">{{flag}}</span>
-										</td>
-									</tr>
-								</table>
-								<table ref="table" v-show="iscopy">
-									<tr>
-										<th>名字</th>
-										<th>id</th>
-										<th>次数</th>
-										<th>总伤(M)</th>
-										<th>排名</th>
-										<th>均伤(M)</th>
-										<th>排名</th>
-										<th>汇总</th>
-									</tr>
-									<tr v-for="(item,index) in output">
-										<td><font v-bind:color="ncolor(qcolor(item.qty),dcolor(item.dmgrank))">{{item.name}}</font></td>
-										<td>{{item.id}}</font></td>
-										<td><font v-bind:color="qcolor(item.qty)">{{item.qty}}</font></td>
-										<td><font v-bind:color="dcolor(item.dmgrank)">{{omit(item.dmg)}}</font></td>
-										<td>{{item.dmgrank}}</td>
-										<td>{{omit(item.avg)}}</td>
-										<td>{{item.avgrank}}</td>
-										<td>
-											<span v-if="index==0">人数</span>
-											<span v-if="index==1">{{output.length}}</span>
-											<span v-if="index==2">次数</span>
-											<span v-if="index==3">{{maxqty}}</span>
-											<span v-if="index==4">均总伤(M)</span>
-											<span v-if="index==5">{{omit(admg)}}</span>
-											<span v-if="index==6">均均伤(M)</span>
-											<span v-if="index==7">{{omit(aavg)}}</span>
-											<span v-if="index==8">满伤比</span>
-											<span v-if="index==9">{{(omit(admg)/maxqty/omit(aavg)).toFixed(2)}}</span>
-											<span v-if="index==10">旗子</span>
-											<span v-if="index==11">{{flag}}</span>
-										</td>
-									</tr>
-								</table>
+							<div class="control" v-if="finish">
+								<span>标题</span>
+								<input class="text" v-if="!!catchdata.item" v-model="catchdata.item.title" v-on:change="savedata" placeholder="起个名字吧">
+								<input class="text" v-else v-model="title" placeholder="起个名字吧">
 							</div>
-						</div>
-						<div class="catchbox" v-if="catchdata.show">
-							<i class="close" v-on:click="catchdata.show=false">✕</i>
-							<div class="con">
-								<div class="add" v-if="finish" v-on:click="catch_add">+ 保存当前数据</div>
-								<div class="dd" v-for="(item,index) of catchdata.list">
-									<i class="w" v-if="catchdata.model=='set'" v-on:click="catch_del(index,item)">✕</i>
-									<i class="i" v-if="catchdata.model=='get'" v-on:click="catch_get(index,item)">✓</i>
-									<span>{{item.time}}</span>
+							<div class="control" v-if="finish">
+								<span>士气</span>
+								<input class="text" v-if="!!catchdata.item" v-model="catchdata.item.flag" v-on:change="savedata" placeholder="25~45之间">
+								<input class="text" v-else v-model="flag" placeholder="25~45之间">
+							</div>
+							<div class="control" v-if="finish">
+								<span>操作</span>
+								<button class="btn imp" v-on:click="copy">复制</button>
+								<button class="btn imp" v-on:click="catch_add">保存</button>
+							</div>
+							<div ref="tabletd"></div>
+							<div class="initbox" v-if="false">
+								<div>统计数据</div>
+								<button class="btn imp" v-on:click="area_show('inp','输入从游戏中导出的数据：部落->资讯->前次突袭->复制')">从游戏取</button>
+								<button class="btn imp" v-on:click="area_show('tinp','输入从表格中复制的数据，来源是之前点复制按钮出来的数据')">从表格取</button>
+								<button class="btn imp" v-on:click="catch_show('inp')">从记录取</button>
+							</div>
+							<div class="tablebox">
+								<div class="table poa">
+									<table>
+										<tr class="th1">
+											<th class="anitran1" v-bind:style="poa2.th2">名字</th>
+										</tr>
+										<tr v-for="(item,index) in output">
+											<td><font v-bind:color="ncolor(qcolor(item.qty),dcolor(item.dmgrank))">{{item.name}}</font></td>
+										</tr>
+									</table>
 								</div>
+								<div class="table por">
+									<table>
+										<tr class="anitran1" v-bind:style="poa2.th2">
+											<th>id</th>
+											<th class="cp" v-bind:class="{im:sort=='qsu'||sort=='qsd'}" v-on:click="qschange">次数 <span v-if="sort=='qsu'">▲</span><span v-else>▼</span></th>
+											<th>总伤(M)</th>
+											<th class="cp" v-bind:class="{im:sort=='dsu'||sort=='dsd'}" v-on:click="dschange">排名 <span v-if="sort=='dsu'">▼</span><span v-else>▲</span></th>
+											<th>均伤(M)</th>
+											<th class="cp" v-bind:class="{im:sort=='asu'||sort=='asd'}" v-on:click="aschange">排名 <span v-if="sort=='asu'">▼</span><span v-else>▲</span></th>
+											<th>汇总</th>
+										</tr>
+										<tr ref="poa2top" v-for="(item,index) in output">
+											<td>{{item.id}}</font></td>
+											<td><font v-bind:color="qcolor(item.qty)">{{item.qty}}</font></td>
+											<td><font v-bind:color="dcolor(item.dmgrank)">{{omit(item.dmg)}}</font></td>
+											<td>
+												{{item.dmgrank}}
+												<span class="cu" v-if="!!item.pdmgrank&&item.pdmgrank>item.dmgrank"> ↑{{item.pdmgrank-item.dmgrank}}</span>
+												<span class="cd" v-if="!!item.pdmgrank&&item.pdmgrank<item.dmgrank"> ↓{{item.dmgrank-item.pdmgrank}}</span>
+											</td>
+											<td>
+												{{omit(item.avg)}}
+												<span class="cu" v-if="!!item.pavg&&(item.pavg/(dis.flag/100+1.06)*(flag/100+1.06))<item.avg"> ↑{{omit(item.avg-(item.pavg/(dis.flag/100+1.06)*(flag/100+1.06)))}}</span>
+												<span class="cd" v-if="!!item.pavg&&(item.pavg/(dis.flag/100+1.06)*(flag/100+1.06))>item.avg"> ↓{{omit((item.pavg/(dis.flag/100+1.06)*(flag/100+1.06))-item.avg)}}</span>
+											</td>
+											<td>
+												{{item.avgrank}}
+												<span class="cu" v-if="!!item.pavgrank&&item.pavgrank>item.avgrank"> ↑{{item.pavgrank-item.avgrank}}</span>
+												<span class="cd" v-if="!!item.pavgrank&&item.pavgrank<item.avgrank"> ↓{{item.avgrank-item.pavgrank}}</span>
+											</td>
+											<td>
+												<span v-if="index==0">人数</span>
+												<span v-if="index==1">{{output.length}}</span>
+												<span v-if="index==2">次数</span>
+												<span v-if="index==3">{{maxqty}}</span>
+												<span v-if="index==4">均总伤(M)</span>
+												<span v-if="index==5">{{omit(admg)}}</span>
+												<span v-if="index==6">均均伤(M)</span>
+												<span v-if="index==7">{{omit(aavg)}}</span>
+												<span v-if="index==8">满伤比</span>
+												<span v-if="index==9">{{(omit(admg)/maxqty/omit(aavg)).toFixed(2)}}</span>
+												<span v-if="index==10">旗子</span>
+												<span v-if="index==11">{{flag}}</span>
+											</td>
+										</tr>
+									</table>
+									<table ref="table" v-show="iscopy">
+										<tr>
+											<th>名字</th>
+											<th>id</th>
+											<th>次数</th>
+											<th>总伤(M)</th>
+											<th>排名</th>
+											<th>均伤(M)</th>
+											<th>排名</th>
+											<th>汇总</th>
+										</tr>
+										<tr v-for="(item,index) in output">
+											<td><font v-bind:color="ncolor(qcolor(item.qty),dcolor(item.dmgrank))">{{item.name}}</font></td>
+											<td>{{item.id}}</font></td>
+											<td><font v-bind:color="qcolor(item.qty)">{{item.qty}}</font></td>
+											<td><font v-bind:color="dcolor(item.dmgrank)">{{omit(item.dmg)}}</font></td>
+											<td>{{item.dmgrank}}</td>
+											<td>{{omit(item.avg)}}</td>
+											<td>{{item.avgrank}}</td>
+											<td>
+												<span v-if="index==0">人数</span>
+												<span v-if="index==1">{{output.length}}</span>
+												<span v-if="index==2">次数</span>
+												<span v-if="index==3">{{maxqty}}</span>
+												<span v-if="index==4">均总伤(M)</span>
+												<span v-if="index==5">{{omit(admg)}}</span>
+												<span v-if="index==6">均均伤(M)</span>
+												<span v-if="index==7">{{omit(aavg)}}</span>
+												<span v-if="index==8">满伤比</span>
+												<span v-if="index==9">{{(omit(admg)/maxqty/omit(aavg)).toFixed(2)}}</span>
+												<span v-if="index==10">旗子</span>
+												<span v-if="index==11">{{flag}}</span>
+											</td>
+										</tr>
+									</table>
+								</div>
+								<div class="blank" v-if="output.length==0">无数据</div>
+							</div>
+						</div>
+						<div v-if="tab=='record'">
+							<div class="control">
+								<button class="btn" v-on:click="catch_in">导入记录</button>
+								<button class="btn" v-on:click="catch_out">导出记录</button>
+							</div>
+							<div class="catchcon">
+								<div class="dd" v-for="(item,index) of catchdata.list">
+									<div class="info">
+										<div class="title">{{item.title}}</div>
+										<div class="more">{{item.time}}</div>
+										<div class="more">{{item.flag}}士气</div>
+									</div>
+									<div class="oper">
+										<i class="w" v-on:click="catch_del(index,item)">✕</i>
+									</div>
+								</div>
+								<div class="blank" v-if="catchdata.list.length==0">无记录</div>
+							</div>
+						</div>
+						<div v-if="tab=='intro'">
+							<div class="introcon">
+								<div class="p">• 本功能可以从游戏中导入突袭数据，处理后已表格形式展示统计结果。</div>
+								<div class="p">• 有3种导入方式：导入游戏中的突袭数据、导入从本功能复制出来的数据、导入保存在本功能记录中的数据。</div>
+								<div class="p">• 展示统计结果后可以再和另一条数据进行对比，对比项有总伤排名、均伤、均伤排名。</div>
+								<div class="p">• 对比有2种导入方式：导入从本功能复制出来的数据、导入保存在本功能记录中的数据。</div>
+								<div class="p">• 展示统计结果后可以把数据复制出来，粘贴到excel中备份，也可以直接保存到记录中，记录中的数据可以随时导入导出。</div>
+							</div>
+						</div>
+						<div class="floatbtn" v-if="tab=='table'" v-bind:class="{show:inpshow}">
+							<div class="lv2 anitran1" v-on:click="area_show('inp','输入从游戏中导出的数据：部落->资讯->前次突袭->复制')">-><span>从游戏取</span></div>
+							<div class="lv2 anitran1" v-on:click="area_show('tinp','输入从表格中复制的数据，来源是之前点复制按钮出来的数据')">-><span>从表格取</span></div>
+							<div class="lv2 anitran1" v-on:click="catch_show('inp')">-><span>从记录取</span></div>
+							<div class="lv1" v-on:click="inpshow=!inpshow">统计<br>数据</div>
+						</div>
+						<div class="floatbtn dis" v-if="tab=='table'" v-if="finish" v-bind:class="{show:disshow}">
+							<div class="lv2 anitran1" v-on:click="area_show('tdis','输入对比数据，来源是之前点复制按钮出来的数据')">-><span>从表格取</span></div>
+							<div class="lv2 anitran1" v-on:click="catch_show('dis')">-><span>从记录取</span></div>
+							<div class="lv1" v-on:click="disshow=!disshow">对比<br>数据</div>
+						</div>
+						<div class="catchbox anitran1" v-bind:class="{show:catchdata.show}">
+							<i class="close" v-on:click="catchdata.show=false">✕</i>
+							<div class="con anitran1" v-bind:class="{show:catchdata.show}">
+								<div class="end" v-if="catchdata.list.length>0">到顶了</div>
+								<div class="dd" v-for="(item,index) of catchdata.list" v-bind:class="{active:!!catchdata.item&&catchdata.item.time==item.time}" v-on:click="catch_get(index,item)">
+									<i class="i">✓</i>
+									<span>{{item.title}}</span>
+								</div>
+								<div class="end" v-if="catchdata.list.length==0">无记录</div>
+								<div class="end" v-if="catchdata.list.length>0">到底了</div>
 							</div>
 						</div>
 						<div class="areabox" v-if="areabox.show">
@@ -584,11 +821,22 @@
 						</div>
 					</div>
 				`,
+				watch:{
+					tab(e){
+						if(e=='table'){
+							setTimeout(()=>{
+								this.pageobs.observe(this.$refs.tabletd);
+							},0);
+						};
+					},
+				},
 				methods: {
 					start(input) {
+						this.title='';
+						this.catchdata.item=null;
+						this.flag='25';
 						this.sort='dsd';
 						this.output=[];
-						this.input=input;
 						let input_td=input.split('\n');
 						let input_th=input_td.shift();
 						let totaldmg_json={};
@@ -628,6 +876,11 @@
 						};
 						if(this.output.length>0){
 							this.finish=true;
+							setTimeout(()=>{
+								this.pageobs.observe(this.$refs.tabletd);
+							},0);
+						}else{
+							alert('数据格式错误，无法处理');
 						};
 					},
 					qschange(){
@@ -710,7 +963,13 @@
 							}
 						);
 					},
+					savedata(){
+						localStorage.setItem('catchdata',JSON.stringify(this.catchdata.list));
+					},
 					inp_start(input){
+						this.title='';
+						this.catchdata.item=null;
+						this.flag='25';
 						this.sort='dsd';
 						this.output=[];
 						let input_td=input.split('\n');
@@ -733,11 +992,15 @@
 							};
 						};
 						this.finish=true;
+						setTimeout(()=>{
+							this.pageobs.observe(this.$refs.tabletd);
+						},0);
 					},
 					dis_start(input){
 						let input_td=input.split('\n');
 						let input_th=input_td.shift();
 						let disoutput=this.output;
+						bool=true;
 						for(let i in input_td){
 							let arr=input_td[i].split('\t');
 							if(arr.length>1){
@@ -746,6 +1009,7 @@
 								};
 								let player=disoutput.find((v)=>{return v.id==arr[1]});
 								if(!!player){
+									bool=false;
 									player.pdmg=parseFloat(arr[3])*1000000;
 									player.pdmgrank=parseFloat(arr[4]);
 									player.pavg=parseFloat(arr[5])*1000000;
@@ -755,9 +1019,11 @@
 						};
 						this.output=[];
 						this.output=disoutput;
+						if(bool){
+							alert('数据格式错误，无法处理');
+						};
 					},
-					catch_show(model,type){
-						this.catchdata.model=model;
+					catch_show(type){
 						this.catchdata.type=type;
 						this.catchdata.show=true;
 					},
@@ -775,26 +1041,35 @@
 							});
 						};
 						this.catchdata.list.unshift({
+							title:this.title||JSON.stringify(new Date()).replace(/\"/g, "").replace(/T/g, " ").replace(/Z/g, ""),
 							time:JSON.stringify(new Date()).replace(/\"/g, "").replace(/T/g, " ").replace(/Z/g, ""),
 							text:JSON.stringify(output),
 							flag:this.flag,
 						});
-						localStorage.setItem('catchdata',JSON.stringify(this.catchdata.list));
+						this.savedata();
+						alert('保存到记录了');
 					},
 					catch_del(v,n){
 						let bool=confirm('确定要删除'+n.time+'这条记录么？');
 						if(bool){
 							this.catchdata.list.splice(v, 1);
 						};
-						localStorage.setItem('catchdata',JSON.stringify(this.catchdata.list));
+						this.savedata();
 					},
 					catch_get(v,n){
 						switch(this.catchdata.type){
 							case 'inp' :
+							this.catchdata.item=n;
+							this.title=n.title;
 							this.output=JSON.parse(n.text);
 							this.flag=n.flag;
 							this.finish=true;
+							this.inpshow=false
+							this.disshow=false
 							this.catchdata.show=false;
+							setTimeout(()=>{
+								this.pageobs.observe(this.$refs.tabletd);
+							},0);
 							break;
 							case 'dis' :
 							let input=JSON.parse(n.text);
@@ -808,6 +1083,8 @@
 								};
 							};
 							this.dis.flag=n.flag;
+							this.inpshow=false
+							this.disshow=false
 							this.catchdata.show=false;
 							break;
 							default:
@@ -830,14 +1107,20 @@
 						switch(this.areabox.type){
 							case 'inp' :
 							this.start(this.areabox.text);
+							this.inpshow=false
+							this.disshow=false
 							this.areabox.show=false;
 							break;
 							case 'tinp' :
 							this.inp_start(this.areabox.text);
+							this.inpshow=false
+							this.disshow=false
 							this.areabox.show=false;
 							break;
 							case 'tdis' :
 							this.dis_start(this.areabox.text);
+							this.inpshow=false
+							this.disshow=false
 							this.areabox.show=false;
 							break;
 							default:
@@ -861,7 +1144,7 @@
 									return false;
 								};
 								this.catchdata.list=list;
-								localStorage.setItem('catchdata',JSON.stringify(this.catchdata.list));
+								this.savedata();
 								alert('导入成功');
 							}
 						};
@@ -901,7 +1184,6 @@
 							};
 						}) 
 					}, {}); 
-					this.pageobs.observe(this.$refs.tabletd);
 					window.document.onscroll=()=>{
 						let thh=this.$refs.poa2top[0].clientHeight;
 						let top=this.$refs.poa2top[0].getBoundingClientRect().top;
