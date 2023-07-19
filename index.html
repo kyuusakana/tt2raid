@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no">
-		<title></title>
+		<title>tt2raid</title>
 		<script src="https://cdn.bootcdn.net/ajax/libs/vue/2.6.0/vue.min.js"></script>
 		<style>
 			*{
@@ -89,7 +89,7 @@
 			}
 			.header .tab{
 				position: relative;
-				margin-top: 0.5rem;
+				margin-top: 1rem;
 				padding: 0 1.5rem;
 				padding-top: 0.5rem;
 				padding-bottom: 1rem;
@@ -132,6 +132,17 @@
 			.header .blank{
 				flex: 1;
 			}
+			
+			.logo{
+				position: fixed;
+				left: 2rem;
+				bottom: 2rem;
+				font-size: 2rem;
+				color: #B2B2B2;
+				z-index: -1;
+				pointer-events: none;
+			}
+			
 			.inputbox{
 				padding: 2rem;
 			}
@@ -262,10 +273,26 @@
 				margin-bottom: 1rem;
 			}
 			
+			.introcon{
+				margin-bottom: 4rem;
+			}
 			.introcon .p{
 				margin-top: 2rem;
 				padding: 0 2rem;
 				font-size: 1.6rem;
+			}
+			.introcon .h2{
+				margin: 0 2rem;
+				margin-top: 2rem;
+				padding-top: 2rem;
+				font-size: 2rem;
+				font-weight: bold;
+				color: #999999;
+				border-top: 1px solid #D4D4D4;
+			}
+			.introcon>div:first-child .h2{
+				margin-top: 0;
+				border-top: none;
 			}
 			
 			.catchcon{
@@ -547,6 +574,33 @@
 					},
 					inpshow:false,
 					disshow:false,
+					updatetext:[
+						{
+							title:'V0.1.19',
+							con:[
+								'• 特性：增加日志标签页。',
+							],
+						},
+						{
+							title:'V0.1.18',
+							con:[
+								'• 特性：增加标签页切换功能，增加说明标签页。',
+								'• 特性：增加均伤数据对比。',
+								'• 特性：从记录取的数据作为当前记录的选中项。',
+								'• 特性：记录可以自定义标题。',
+								'• 优化：修改文本描述，缓存改为记录。',
+								'• 优化：统计和对比数据按钮移到界面右下角。',
+								'• 优化：把记录管理单独成标签，记录导入导出按钮移到记录标签里。',
+								'• 修复：修复表格滚动时表头消失问题。',
+							],
+						},
+						{
+							title:'V0.0.17',
+							con:[
+								'• 修复：修复总伤为0时均伤计算错误问题。',
+							],
+						},
+					],
 				},
 				computed:{
 					omit(){
@@ -631,8 +685,8 @@
 							<span class="tab anitran1" v-bind:class="{active:tab=='table'}" v-on:click="tab='table'"><i class="b l anitran1"><i class="c"></i></i>表格<i class="b r anitran1"><i class="c"></i></i></span>
 							<span class="tab anitran1" v-bind:class="{active:tab=='record'}" v-on:click="tab='record'"><i class="b l anitran1"><i class="c"></i></i>记录<i class="b r anitran1"><i class="c"></i></i></span>
 							<span class="tab anitran1" v-bind:class="{active:tab=='intro'}" v-on:click="tab='intro'"><i class="b l anitran1"><i class="c"></i></i>说明<i class="b r anitran1"><i class="c"></i></i></span>
+							<span class="tab anitran1" v-bind:class="{active:tab=='update'}" v-on:click="tab='update'"><i class="b l anitran1"><i class="c"></i></i>日志<i class="b r anitran1"><i class="c"></i></i></span>
 							<span class="blank"></span>
-							<span>tt2raid V0.1.18</span>
 						</div>
 						<div v-if="tab=='table'">
 							<div class="control" v-if="!!catchdata.item">
@@ -755,6 +809,7 @@
 									</table>
 								</div>
 								<div class="blank" v-if="output.length==0">无数据</div>
+								<div class="logo">tt2raid {{updatetext[0].title}}</div>
 							</div>
 						</div>
 						<div v-if="tab=='record'">
@@ -778,11 +833,21 @@
 						</div>
 						<div v-if="tab=='intro'">
 							<div class="introcon">
-								<div class="p">• 本功能可以从游戏中导入突袭数据，处理后已表格形式展示统计结果。</div>
-								<div class="p">• 有3种导入方式：导入游戏中的突袭数据、导入从本功能复制出来的数据、导入保存在本功能记录中的数据。</div>
-								<div class="p">• 展示统计结果后可以再和另一条数据进行对比，对比项有总伤排名、均伤、均伤排名。</div>
-								<div class="p">• 对比有2种导入方式：导入从本功能复制出来的数据、导入保存在本功能记录中的数据。</div>
-								<div class="p">• 展示统计结果后可以把数据复制出来，粘贴到excel中备份，也可以直接保存到记录中，记录中的数据可以随时导入导出。</div>
+								<div>
+									<div class="p">• 本功能可以从游戏中导入突袭数据，处理后已表格形式展示统计结果。</div>
+									<div class="p">• 有3种导入方式：导入游戏中的突袭数据、导入从本功能复制出来的数据、导入保存在本功能记录中的数据。</div>
+									<div class="p">• 展示统计结果后可以再和另一条数据进行对比，对比项有总伤排名、均伤、均伤排名。</div>
+									<div class="p">• 对比有2种导入方式：导入从本功能复制出来的数据、导入保存在本功能记录中的数据。</div>
+									<div class="p">• 展示统计结果后可以把数据复制出来，粘贴到excel中备份，也可以直接保存到记录中，记录中的数据可以随时导入导出。</div>
+								</div>
+							</div>
+						</div>
+						<div v-if="tab=='update'">
+							<div class="introcon">
+								<div v-for="item in updatetext">
+									<div class="h2">{{item.title}}</div>
+									<div class="p" v-for="con in item.con">{{con}}</div>
+								</div>
 							</div>
 						</div>
 						<div class="floatbtn" v-if="tab=='table'" v-bind:class="{show:inpshow}">
@@ -791,7 +856,7 @@
 							<div class="lv2 anitran1" v-on:click="catch_show('inp')">-><span>从记录取</span></div>
 							<div class="lv1" v-on:click="inpshow=!inpshow">统计<br>数据</div>
 						</div>
-						<div class="floatbtn dis" v-if="tab=='table'" v-if="finish" v-bind:class="{show:disshow}">
+						<div class="floatbtn dis" v-if="tab=='table'&&finish" v-bind:class="{show:disshow}">
 							<div class="lv2 anitran1" v-on:click="area_show('tdis','输入对比数据，来源是之前点复制按钮出来的数据')">-><span>从表格取</span></div>
 							<div class="lv2 anitran1" v-on:click="catch_show('dis')">-><span>从记录取</span></div>
 							<div class="lv1" v-on:click="disshow=!disshow">对比<br>数据</div>
