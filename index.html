@@ -5,6 +5,7 @@
 		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no">
 		<title>tt2raid</title>
 		<script src="https://cdn.bootcdn.net/ajax/libs/vue/2.6.0/vue.min.js"></script>
+		<script src="https://cdn.staticfile.org/dom-to-image/2.6.0/dom-to-image.min.js"></script>
 		<style>
 			*{
 				font-family: "Microsoft Yahei";
@@ -333,6 +334,28 @@
 			.catchcon .oper i.w{
 				color: #EE5555;
 			}
+			.catchcon .sort{
+				display: flex;
+				align-items: center;
+				margin-left: -1rem;
+			}
+			.catchcon .sort i{
+				width: 2rem;
+				font-size: 2.4rem;
+				cursor: pointer;
+			}
+			.catchcon .sort i.l{
+				padding-right: 0.2rem;
+				text-align: right;
+			}
+			.catchcon .sort i.r{
+				padding-left: 0.2rem;
+				text-align: left;
+			}
+			.catchcon .sort i:hover{
+				color: #3399FF;
+				background-color: rgba(0, 0, 0, 0.1);
+			}
 			
 			.initbox{
 				display: flex;
@@ -531,6 +554,11 @@
 			.floatbtn.show .lv2 span{
 				opacity: 1;
 			}
+			
+			.domtoimg{
+				display: inline-block;
+				padding-bottom: 1rem;
+			}
 		</style>
 	</head>
 	<body>
@@ -575,6 +603,14 @@
 					inpshow:false,
 					disshow:false,
 					updatetext:[
+						{
+							title:'V0.1.20',
+							con:[
+								'• 特性：增加调整记录顺序功能。',
+								'• 特性：增加表格生成图片功能。',
+								'• 修复：修复表格无法复制问题。',
+							],
+						},
 						{
 							title:'V0.1.19',
 							con:[
@@ -707,6 +743,7 @@
 								<span>操作</span>
 								<button class="btn imp" v-on:click="copy">复制</button>
 								<button class="btn imp" v-on:click="catch_add">保存</button>
+								<button class="btn imp" v-on:click="domtoimage">图片</button>
 							</div>
 							<div ref="tabletd"></div>
 							<div class="initbox" v-if="false">
@@ -772,41 +809,43 @@
 											</td>
 										</tr>
 									</table>
-									<table ref="table" v-show="iscopy">
-										<tr>
-											<th>名字</th>
-											<th>id</th>
-											<th>次数</th>
-											<th>总伤(M)</th>
-											<th>排名</th>
-											<th>均伤(M)</th>
-											<th>排名</th>
-											<th>汇总</th>
-										</tr>
-										<tr v-for="(item,index) in output">
-											<td><font v-bind:color="ncolor(qcolor(item.qty),dcolor(item.dmgrank))">{{item.name}}</font></td>
-											<td>{{item.id}}</font></td>
-											<td><font v-bind:color="qcolor(item.qty)">{{item.qty}}</font></td>
-											<td><font v-bind:color="dcolor(item.dmgrank)">{{omit(item.dmg)}}</font></td>
-											<td>{{item.dmgrank}}</td>
-											<td>{{omit(item.avg)}}</td>
-											<td>{{item.avgrank}}</td>
-											<td>
-												<span v-if="index==0">人数</span>
-												<span v-if="index==1">{{output.length}}</span>
-												<span v-if="index==2">次数</span>
-												<span v-if="index==3">{{maxqty}}</span>
-												<span v-if="index==4">均总伤(M)</span>
-												<span v-if="index==5">{{omit(admg)}}</span>
-												<span v-if="index==6">均均伤(M)</span>
-												<span v-if="index==7">{{omit(aavg)}}</span>
-												<span v-if="index==8">满伤比</span>
-												<span v-if="index==9">{{(omit(admg)/maxqty/omit(aavg)).toFixed(2)}}</span>
-												<span v-if="index==10">旗子</span>
-												<span v-if="index==11">{{flag}}</span>
-											</td>
-										</tr>
-									</table>
+									<div class="domtoimg anisa" ref="table" v-show="iscopy">
+										<table class="anisa">
+											<tr>
+												<th>名字</th>
+												<th>id</th>
+												<th>次数</th>
+												<th>总伤(M)</th>
+												<th>排名</th>
+												<th>均伤(M)</th>
+												<th>排名</th>
+												<th>汇总</th>
+											</tr>
+											<tr v-for="(item,index) in output">
+												<td><font v-bind:color="ncolor(qcolor(item.qty),dcolor(item.dmgrank))">{{item.name}}</font></td>
+												<td>{{item.id}}</font></td>
+												<td><font v-bind:color="qcolor(item.qty)">{{item.qty}}</font></td>
+												<td><font v-bind:color="dcolor(item.dmgrank)">{{omit(item.dmg)}}</font></td>
+												<td>{{item.dmgrank}}</td>
+												<td>{{omit(item.avg)}}</td>
+												<td>{{item.avgrank}}</td>
+												<td>
+													<span v-if="index==0">人数</span>
+													<span v-if="index==1">{{output.length}}</span>
+													<span v-if="index==2">次数</span>
+													<span v-if="index==3">{{maxqty}}</span>
+													<span v-if="index==4">均总伤(M)</span>
+													<span v-if="index==5">{{omit(admg)}}</span>
+													<span v-if="index==6">均均伤(M)</span>
+													<span v-if="index==7">{{omit(aavg)}}</span>
+													<span v-if="index==8">满伤比</span>
+													<span v-if="index==9">{{(omit(admg)/maxqty/omit(aavg)).toFixed(2)}}</span>
+													<span v-if="index==10">旗子</span>
+													<span v-if="index==11">{{flag}}</span>
+												</td>
+											</tr>
+										</table>
+									</div>
 								</div>
 								<div class="blank" v-if="output.length==0">无数据</div>
 								<div class="logo">tt2raid {{updatetext[0].title}}</div>
@@ -819,6 +858,10 @@
 							</div>
 							<div class="catchcon">
 								<div class="dd" v-for="(item,index) of catchdata.list">
+									<div class="sort">
+										<i class="l" v-on:click="catchsp(index)">↿</i>
+										<i class="r" v-on:click="catchsn(index)">⇂</i>
+									</div>
 									<div class="info">
 										<div class="title">{{item.title}}</div>
 										<div class="more">{{item.time}}</div>
@@ -839,6 +882,7 @@
 									<div class="p">• 展示统计结果后可以再和另一条数据进行对比，对比项有总伤排名、均伤、均伤排名。</div>
 									<div class="p">• 对比有2种导入方式：导入从本功能复制出来的数据、导入保存在本功能记录中的数据。</div>
 									<div class="p">• 展示统计结果后可以把数据复制出来，粘贴到excel中备份，也可以直接保存到记录中，记录中的数据可以随时导入导出。</div>
+									<div class="p">• 展示统计结果后可以把数据保存成图片。</div>
 								</div>
 							</div>
 						</div>
@@ -1192,6 +1236,20 @@
 							alert('异常操作');
 						};
 					},
+					catchsp(index){
+						if(index>0){
+							let i = this.catchdata.list.splice(index, 1);
+							this.catchdata.list.splice(index-1, 0, i[0]);
+							this.savedata();
+						};
+					},
+					catchsn(index){
+						if(index<this.catchdata.list.length-1){
+							let i = this.catchdata.list.splice(index, 1);
+							this.catchdata.list.splice(index+1, 0, i[0]);
+							this.savedata();
+						};
+					},
 					catch_in(){
 						let file=document.createElement("input");
 						file.type="file";
@@ -1226,6 +1284,18 @@
 						aTag.download = 'tt2raid_catch_'+JSON.stringify(new Date()).replace(/\"/g, "").replace(/T/g, "_").replace(/:/g, "").replace(/\./g, "").replace(/Z/g, "").replace(/ /g, "")+'.txt';
 						aTag.click();
 						URL.revokeObjectURL(objectURL);
+					},
+					domtoimage(){
+						this.iscopy=true;
+						domtoimage.toBlob(this.$refs.table).then((blob)=>{
+							this.iscopy=false;
+							const objectURL = URL.createObjectURL(blob);
+							const aTag = document.createElement('a');
+							aTag.href = objectURL;
+							aTag.download = 'tt2raid_img_'+JSON.stringify(new Date()).replace(/\"/g, "").replace(/T/g, "_").replace(/:/g, "").replace(/\./g, "").replace(/Z/g, "").replace(/ /g, "")+'.png';
+							aTag.click();
+							URL.revokeObjectURL(objectURL);
+						});
 					},
 				},
 				mounted(){
