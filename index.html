@@ -604,6 +604,12 @@
 					disshow:false,
 					updatetext:[
 						{
+							title:'V0.1.21',
+							con:[
+								'• 优化：修正对比数据计算参数。',
+							],
+						},
+						{
 							title:'V0.1.20',
 							con:[
 								'• 特性：增加调整记录顺序功能。',
@@ -785,8 +791,8 @@
 											</td>
 											<td>
 												{{omit(item.avg)}}
-												<span class="cu" v-if="!!item.pavg&&(item.pavg/(dis.flag/100+1.06)*(flag/100+1.06))<item.avg"> ↑{{omit(item.avg-(item.pavg/(dis.flag/100+1.06)*(flag/100+1.06)))}}</span>
-												<span class="cd" v-if="!!item.pavg&&(item.pavg/(dis.flag/100+1.06)*(flag/100+1.06))>item.avg"> ↓{{omit((item.pavg/(dis.flag/100+1.06)*(flag/100+1.06))-item.avg)}}</span>
+												<span class="cu" v-if="!!item.pavg&&(item.pavg/(dis.flag/100+1.65)*(flag/100+1.65))<item.avg"> ↑{{omit(item.avg-(item.pavg/(dis.flag/100+1.65)*(flag/100+1.65)))}}</span>
+												<span class="cd" v-if="!!item.pavg&&(item.pavg/(dis.flag/100+1.65)*(flag/100+1.65))>item.avg"> ↓{{omit((item.pavg/(dis.flag/100+1.65)*(flag/100+1.65))-item.avg)}}</span>
 											</td>
 											<td>
 												{{item.avgrank}}
