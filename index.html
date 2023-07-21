@@ -607,6 +607,7 @@
 							title:'V0.1.21',
 							con:[
 								'• 优化：修正对比数据计算参数。',
+								'• 修复：修复表格中的旗子不跟随输入框变化问题。',
 							],
 						},
 						{
@@ -742,7 +743,7 @@
 							</div>
 							<div class="control" v-if="finish">
 								<span>士气</span>
-								<input class="text" v-if="!!catchdata.item" v-model="catchdata.item.flag" v-on:change="savedata" placeholder="25~45之间">
+								<input class="text" v-if="!!catchdata.item" v-model="catchdata.item.flag" v-on:change="changeflag" v-on:change="savedata" placeholder="25~45之间">
 								<input class="text" v-else v-model="flag" placeholder="25~45之间">
 							</div>
 							<div class="control" v-if="finish">
@@ -1077,6 +1078,9 @@
 								alert("复制失败: ", err);
 							}
 						);
+					},
+					changeflag(){
+						this.flag=this.catchdata.item.flag;
 					},
 					savedata(){
 						localStorage.setItem('catchdata',JSON.stringify(this.catchdata.list));
