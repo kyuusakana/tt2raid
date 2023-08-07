@@ -6,6 +6,7 @@
 		<title>tt2raid</title>
 		<script src="https://cdn.bootcdn.net/ajax/libs/vue/2.6.0/vue.min.js"></script>
 		<script src="https://cdn.staticfile.org/dom-to-image/2.6.0/dom-to-image.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
 		<style>
 			*{
 				font-family: "Microsoft Yahei";
@@ -559,6 +560,11 @@
 				display: inline-block;
 				padding-bottom: 1rem;
 			}
+			
+			.chartcon{
+				width: 100%;
+				height: 80rem;
+			}
 		</style>
 	</head>
 	<body>
@@ -602,7 +608,15 @@
 					},
 					inpshow:false,
 					disshow:false,
+					chart:null,
+					ischart:false,
 					updatetext:[
+						{
+							title:'V0.1.22',
+							con:[
+								'• 特性：增加折线图统计功能。',
+							],
+						},
 						{
 							title:'V0.1.21',
 							con:[
@@ -862,7 +876,9 @@
 							<div class="control">
 								<button class="btn" v-on:click="catch_in">导入记录</button>
 								<button class="btn" v-on:click="catch_out">导出记录</button>
+								<button class="btn" v-on:click="chartshow">图表</button>
 							</div>
+							<div class="chartcon" ref="chart" v-if="ischart"></div>
 							<div class="catchcon">
 								<div class="dd" v-for="(item,index) of catchdata.list">
 									<div class="sort">
@@ -939,6 +955,7 @@
 				`,
 				watch:{
 					tab(e){
+						this.ischart=false;
 						if(e=='table'){
 							setTimeout(()=>{
 								this.pageobs.observe(this.$refs.tabletd);
@@ -1307,6 +1324,97 @@
 							URL.revokeObjectURL(objectURL);
 						});
 					},
+					chartshow(){
+						if(this.ischart){
+							return false;
+						};
+						this.ischart=true;
+						setTimeout(()=>{
+							this.chart=echarts.init(this.$refs.chart);
+							let option = {
+								grid:{
+									top:60,
+									bottom:20,
+									left:40,
+									right:40,
+								},
+								legend: {
+									top: 10,
+									width: '98%',
+									itemWidth: 10,
+									itemHeight: 10,
+									selector: true,
+									selectorPosition:'stert',
+									type: 'scroll',
+								},
+								dataZoom:[
+									{},
+									{
+										type:'slider',
+										brushSelect:false,
+									}
+								],
+								xAxis: {
+									type: 'category',
+									data: []
+								},
+								yAxis: {
+									type: 'value'
+								},
+								series: [{
+									name:'平均值',
+									type:'line',
+									data:[],
+									lineStyle:{
+										type:'dashed',
+									},
+								}]
+							};
+							let times=[];
+							for(let item of this.catchdata.list){
+								times.unshift(item);
+							};
+							let firstp={};
+							for(let list in times){
+								option.xAxis.data.push(times[list].title);
+								let avgtotal=0;
+								for(let user of JSON.parse(times[list].text)){
+									let s=option.series.find((v)=>{
+										return v.id==user.id;
+									});
+									if(!!!s){
+										let data=[];
+										data[list]=parseFloat((user.avg/1000000).toFixed(2));
+										option.series.push({
+											id:user.id,
+											name:user.name,
+											data: data,
+											type:'line',
+											label:{
+												show:true,
+												position:'left',
+												// formatter:'{a}',
+												formatter: function (params) {
+													if(params.dataIndex==firstp[user.id]){
+														return params.seriesName; 
+													}else{
+														return '';
+													};
+												},
+											},
+										});
+										firstp[user.id]=list;
+									}else{
+										s.data[list]=parseFloat((user.avg/1000000).toFixed(2));
+									};
+									avgtotal+=parseFloat((user.avg/1000000).toFixed(2));
+								};
+								avgtotal=avgtotal/JSON.parse(times[list].text).length;
+								option.series[0].data.push(avgtotal);
+							};
+							this.chart.setOption(option);
+						},0);
+					},
 				},
 				mounted(){
 					let c;
@@ -1338,6 +1446,9 @@
 							this.poa2.th2.transform='translateY(0)';
 						};
 					};
+					window.addEventListener('resize',()=>{
+						this.chart.resize();
+					});
 				},
 			});
 		</script>
