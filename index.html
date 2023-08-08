@@ -955,6 +955,7 @@
 				`,
 				watch:{
 					tab(e){
+						this.chart.dispose();
 						this.ischart=false;
 						if(e=='table'){
 							setTimeout(()=>{
@@ -1330,17 +1331,16 @@
 						};
 						this.ischart=true;
 						setTimeout(()=>{
-							this.chart=echarts.init(this.$refs.chart);
+							this.chart=echarts.init(this.$refs.chart, null, { renderer: 'svg' });
 							let option = {
 								grid:{
 									top:60,
 									bottom:20,
-									left:40,
-									right:40,
+									left:20,
+									right:20,
 								},
 								legend: {
 									top: 10,
-									width: '98%',
 									itemWidth: 10,
 									itemHeight: 10,
 									selector: true,
@@ -1351,12 +1351,16 @@
 									{},
 									{
 										type:'slider',
+										// handlePosition:'inside',
+										handleStyle: { borderWidth: 4 },
 										brushSelect:false,
+										handleSize:'200%',
 									}
 								],
 								xAxis: {
 									type: 'category',
-									data: []
+									data: [],
+									boundaryGap: false,
 								},
 								yAxis: {
 									type: 'value'
@@ -1375,6 +1379,7 @@
 								times.unshift(item);
 							};
 							let firstp={};
+							let zoomp=0;
 							for(let list in times){
 								option.xAxis.data.push(times[list].title);
 								let avgtotal=0;
@@ -1392,10 +1397,20 @@
 											type:'line',
 											label:{
 												show:true,
-												position:'left',
+												position:'right',
 												// formatter:'{a}',
 												formatter: function (params) {
-													if(params.dataIndex==firstp[user.id]){
+													let z;
+													if(parseInt(firstp[user.id])<zoomp){
+														if(parseInt(firstp[user.id])>0){
+															z=zoomp;
+														}else{
+															z=parseInt(firstp[user.id])+zoomp;
+														};
+													}else{
+														z=parseInt(firstp[user.id]);
+													};
+													if(params.dataIndex==z){
 														return params.seriesName; 
 													}else{
 														return '';
@@ -1412,7 +1427,11 @@
 								avgtotal=avgtotal/JSON.parse(times[list].text).length;
 								option.series[0].data.push(avgtotal);
 							};
+							console.log(firstp);
 							this.chart.setOption(option);
+							this.chart.on('dataZoom',(params)=>{
+								zoomp=this.chart.getOption().dataZoom[1].startValue;
+							});
 						},0);
 					},
 				},
