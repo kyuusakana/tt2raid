@@ -895,11 +895,13 @@
 								<div class="table">
 									<table>
 										<tr>
+											<th>排名</th>
 											<th>名字</th>
 											<th>id</th>
 											<th>贡献</th>
 										</tr>
 										<tr v-for="(item,index) in belowdata">
+											<td>{{index+1}}</td>
 											<td>{{item.name}}</td>
 											<td>{{item.id}}</td>
 											<td>{{item.num}}</td>
@@ -1488,6 +1490,17 @@
 						};
 						return num;
 					},
+					countChar(text) {
+						var len = 0;
+						for (var i = 0; i < text.length; i++) {
+							if (text.charCodeAt(i) > 127) {
+								len += 2;
+							} else {
+								len++;
+							}
+						}
+						return len;
+					},
 					belowshow(){
 						if(this.isbelow){
 							this.isbelow=false;
@@ -1497,7 +1510,7 @@
 						let names={};
 						let scores={};
 						for(let user of JSON.parse(this.catchdata.list[0].text)){
-							names[user.id]=user.name;
+							names[user.id]=this.countChar(user.name)<=16?user.name:user.name.substring(0,8)+'...';
 						};
 						for(let list of this.catchdata.list){
 							let users=JSON.parse(list.text);
