@@ -422,7 +422,6 @@
 			.catchbox .dd{
 				display: flex;
 				padding: 1rem;
-				padding-left: 0;
 				border-top: 1px solid #D4D4D4;
 				font-size: 1.6rem;
 				word-break: break-all;
@@ -565,6 +564,9 @@
 				width: 100%;
 				height: 80rem;
 			}
+			.belowcon{
+				margin-top: 1rem;
+			}
 		</style>
 	</head>
 	<body>
@@ -610,7 +612,16 @@
 					disshow:false,
 					chart:null,
 					ischart:false,
+					isbelow:false,
+					belowdata:[],
 					updatetext:[
+						{
+							title:'V0.1.23',
+							con:[
+								'• 特性：增加贡献排名功能，综合历史所有合格情况。',
+								'• 优化：从记录取列表显示士气。',
+							],
+						},
 						{
 							title:'V0.1.22',
 							con:[
@@ -796,7 +807,7 @@
 											<th>汇总</th>
 										</tr>
 										<tr ref="poa2top" v-for="(item,index) in output">
-											<td>{{item.id}}</font></td>
+											<td>{{item.id}}</td>
 											<td><font v-bind:color="qcolor(item.qty)">{{item.qty}}</font></td>
 											<td><font v-bind:color="dcolor(item.dmgrank)">{{omit(item.dmg)}}</font></td>
 											<td>
@@ -844,7 +855,7 @@
 											</tr>
 											<tr v-for="(item,index) in output">
 												<td><font v-bind:color="ncolor(qcolor(item.qty),dcolor(item.dmgrank))">{{item.name}}</font></td>
-												<td>{{item.id}}</font></td>
+												<td>{{item.id}}</td>
 												<td><font v-bind:color="qcolor(item.qty)">{{item.qty}}</font></td>
 												<td><font v-bind:color="dcolor(item.dmgrank)">{{omit(item.dmg)}}</font></td>
 												<td>{{item.dmgrank}}</td>
@@ -877,8 +888,25 @@
 								<button class="btn" v-on:click="catch_in">导入记录</button>
 								<button class="btn" v-on:click="catch_out">导出记录</button>
 								<button class="btn" v-on:click="chartshow">均伤图表</button>
+								<button class="btn" v-on:click="belowshow">贡献排名</button>
 							</div>
 							<div class="chartcon" ref="chart" v-if="ischart"></div>
+							<div class="belowcon" v-if="isbelow">
+								<div class="table">
+									<table>
+										<tr>
+											<th>名字</th>
+											<th>id</th>
+											<th>贡献</th>
+										</tr>
+										<tr v-for="(item,index) in belowdata">
+											<td>{{item.name}}</td>
+											<td>{{item.id}}</td>
+											<td>{{item.num}}</td>
+										</tr>
+									<table>
+								</div>
+							</div>
 							<div class="catchcon">
 								<div class="dd" v-for="(item,index) of catchdata.list">
 									<div class="sort">
@@ -888,7 +916,7 @@
 									<div class="info">
 										<div class="title">{{item.title}}</div>
 										<div class="more">{{item.time}}</div>
-										<div class="more">{{item.flag}}士气</div>
+										<div class="more">+{{item.flag}}%士气</div>
 									</div>
 									<div class="oper">
 										<i class="w" v-on:click="catch_del(index,item)">✕</i>
@@ -933,8 +961,7 @@
 							<div class="con anitran1" v-bind:class="{show:catchdata.show}">
 								<div class="end" v-if="catchdata.list.length>0">到顶了</div>
 								<div class="dd" v-for="(item,index) of catchdata.list" v-bind:class="{active:!!catchdata.item&&catchdata.item.time==item.time}" v-on:click="catch_get(index,item)">
-									<i class="i">✓</i>
-									<span>{{item.title}}</span>
+									<span>{{item.title}} (+{{item.flag}}%)</span>
 								</div>
 								<div class="end" v-if="catchdata.list.length==0">无记录</div>
 								<div class="end" v-if="catchdata.list.length>0">到底了</div>
@@ -1433,6 +1460,67 @@
 								zoomp=this.chart.getOption().dataZoom[1].startValue;
 							});
 						},0);
+					},
+					list_maxqty(data){
+						let num=0;
+						for(let item of data){
+							num=Math.max(num,item.qty);
+						};
+						return num;
+					},
+					list_qcolor(data,v){
+						let num=0;
+						if(v==this.list_maxqty(data)){
+							num++;
+						};
+						if(v<this.list_maxqty(data)-6){
+							num--;
+						};
+						return num;
+					},
+					list_dcolor(data,v){
+						let num=0;
+						if(v<=10){
+							num++;
+						};
+						if(v==data.length){
+							num--;
+						};
+						return num;
+					},
+					belowshow(){
+						if(this.isbelow){
+							this.isbelow=false;
+							return false;
+						};
+						this.isbelow=true;
+						let names={};
+						let scores={};
+						for(let user of JSON.parse(this.catchdata.list[0].text)){
+							names[user.id]=user.name;
+						};
+						for(let list of this.catchdata.list){
+							let users=JSON.parse(list.text);
+							for(let user of users){
+								if(!!names[user.id]){
+									if(!!!scores[user.id]){
+										scores[user.id]=0;
+									};
+									scores[user.id]+=this.list_qcolor(users,user.qty)+this.list_dcolor(users,user.dmgrank);
+								};
+							};
+						};
+						this.belowdata=[];
+						for(let key in names){
+							this.belowdata.push({
+								id:key,
+								name:names[key],
+								num:scores[key],
+							});
+						};
+						this.belowdata.sort(function (a,b){
+							return b.num-a.num;
+						});
 					},
 				},
 				mounted(){
