@@ -898,12 +898,14 @@
 											<th>排名</th>
 											<th>名字</th>
 											<th>id</th>
+											<th>总均伤(M)</th>
 											<th>贡献</th>
 										</tr>
 										<tr v-for="(item,index) in belowdata">
 											<td>{{index+1}}</td>
 											<td>{{item.name}}</td>
 											<td>{{item.id}}</td>
+											<td>{{omit(item.avg)}}</td>
 											<td>{{item.num}}</td>
 										</tr>
 									<table>
@@ -1517,9 +1519,15 @@
 							for(let user of users){
 								if(!!names[user.id]){
 									if(!!!scores[user.id]){
-										scores[user.id]=0;
+										scores[user.id]={
+											num:0,
+											avg:0,
+											count:0,
+										};
 									};
-									scores[user.id]+=this.list_qcolor(users,user.qty)+this.list_dcolor(users,user.dmgrank);
+									scores[user.id].num+=this.list_qcolor(users,user.qty)+this.list_dcolor(users,user.dmgrank);
+									scores[user.id].avg+=user.avg;
+									scores[user.id].count++;
 								};
 							};
 						};
@@ -1528,12 +1536,14 @@
 							this.belowdata.push({
 								id:key,
 								name:names[key],
-								num:scores[key],
+								num:scores[key].num,
+								avg:scores[key].avg/scores[key].count,
 							});
 						};
 						this.belowdata.sort(function (a,b){
 							return b.num-a.num;
 						});
+						console.log(this.belowdata);
 					},
 				},
 				mounted(){
