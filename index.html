@@ -616,6 +616,13 @@
 					belowdata:[],
 					updatetext:[
 						{
+							title:'V0.1.24',
+							con:[
+								'• 优化：均伤图表和贡献排名新开标签。',
+								'• 优化：贡献排名增加导出图片功能。',
+							],
+						},
+						{
 							title:'V0.1.23',
 							con:[
 								'• 特性：增加贡献排名功能，综合历史所有合格情况。',
@@ -751,6 +758,7 @@
 					<div class="anisn">
 						<div class="header">
 							<span class="tab anitran1" v-bind:class="{active:tab=='table'}" v-on:click="tab='table'"><i class="b l anitran1"><i class="c"></i></i>表格<i class="b r anitran1"><i class="c"></i></i></span>
+							<span class="tab anitran1" v-bind:class="{active:tab=='nail'}" v-on:click="tab='nail'"><i class="b l anitran1"><i class="c"></i></i>总览<i class="b r anitran1"><i class="c"></i></i></span>
 							<span class="tab anitran1" v-bind:class="{active:tab=='record'}" v-on:click="tab='record'"><i class="b l anitran1"><i class="c"></i></i>记录<i class="b r anitran1"><i class="c"></i></i></span>
 							<span class="tab anitran1" v-bind:class="{active:tab=='intro'}" v-on:click="tab='intro'"><i class="b l anitran1"><i class="c"></i></i>说明<i class="b r anitran1"><i class="c"></i></i></span>
 							<span class="tab anitran1" v-bind:class="{active:tab=='update'}" v-on:click="tab='update'"><i class="b l anitran1"><i class="c"></i></i>日志<i class="b r anitran1"><i class="c"></i></i></span>
@@ -883,17 +891,16 @@
 								<div class="logo">tt2raid {{updatetext[0].title}}</div>
 							</div>
 						</div>
-						<div v-if="tab=='record'">
+						<div v-if="tab=='nail'">
 							<div class="control">
-								<button class="btn" v-on:click="catch_in">导入记录</button>
-								<button class="btn" v-on:click="catch_out">导出记录</button>
 								<button class="btn" v-on:click="chartshow">均伤图表</button>
 								<button class="btn" v-on:click="belowshow">贡献排名</button>
+								<button class="btn" v-if="isbelow" v-on:click="belowtoimg">图片</button>
 							</div>
 							<div class="chartcon" ref="chart" v-if="ischart"></div>
 							<div class="belowcon" v-if="isbelow">
-								<div class="table">
-									<table>
+								<div class="table domtoimg anisa" ref="below">
+									<table class="anisa">
 										<tr>
 											<th>排名</th>
 											<th>名字</th>
@@ -910,6 +917,12 @@
 										</tr>
 									<table>
 								</div>
+							</div>
+						</div>
+						<div v-if="tab=='record'">
+							<div class="control">
+								<button class="btn" v-on:click="catch_in">导入记录</button>
+								<button class="btn" v-on:click="catch_out">导出记录</button>
 							</div>
 							<div class="catchcon">
 								<div class="dd" v-for="(item,index) of catchdata.list">
@@ -1544,6 +1557,16 @@
 							return b.num-a.num;
 						});
 						console.log(this.belowdata);
+					},
+					belowtoimg(){
+						domtoimage.toBlob(this.$refs.below).then((blob)=>{
+							const objectURL = URL.createObjectURL(blob);
+							const aTag = document.createElement('a');
+							aTag.href = objectURL;
+							aTag.download = 'tt2raid_img_'+JSON.stringify(new Date()).replace(/\"/g, "").replace(/T/g, "_").replace(/:/g, "").replace(/\./g, "").replace(/Z/g, "").replace(/ /g, "")+'.png';
+							aTag.click();
+							URL.revokeObjectURL(objectURL);
+						});
 					},
 				},
 				mounted(){
