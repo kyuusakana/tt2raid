@@ -557,6 +557,7 @@
 			
 			.domtoimg{
 				display: inline-block;
+				margin: 0;
 				padding-bottom: 1rem;
 			}
 			
@@ -615,6 +616,12 @@
 					isbelow:false,
 					belowdata:[],
 					updatetext:[
+						{
+							title:'V0.1.25',
+							con:[
+								'• 优化：修改次数的贡献计算方式。',
+							],
+						},
 						{
 							title:'V0.1.24',
 							con:[
@@ -906,7 +913,7 @@
 											<th>名字</th>
 											<th>id</th>
 											<th>总均伤(M)</th>
-											<th>贡献</th>
+											<th>总贡献</th>
 										</tr>
 										<tr v-for="(item,index) in belowdata">
 											<td>{{index+1}}</td>
@@ -1487,12 +1494,13 @@
 					},
 					list_qcolor(data,v){
 						let num=0;
-						if(v==this.list_maxqty(data)){
-							num++;
-						};
-						if(v<this.list_maxqty(data)-6){
-							num--;
-						};
+						num=Math.floor((v-this.list_maxqty(data))/6)+1;
+						// if(v==this.list_maxqty(data)){
+						// 	num++;
+						// };
+						// if(v<this.list_maxqty(data)-6){
+						// 	num--;
+						// };
 						return num;
 					},
 					list_dcolor(data,v){
@@ -1556,7 +1564,6 @@
 						this.belowdata.sort(function (a,b){
 							return b.num-a.num;
 						});
-						console.log(this.belowdata);
 					},
 					belowtoimg(){
 						domtoimage.toBlob(this.$refs.below).then((blob)=>{
