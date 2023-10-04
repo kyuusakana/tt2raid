@@ -565,6 +565,60 @@
 				width: 100%;
 				height: 80rem;
 			}
+			.chartuser{
+				position: absolute;
+				left: 0;
+				right: 0;
+				padding: 0 1rem;
+				background-color: rgba(255,255,255,0.8);
+				z-index: 1;
+			}
+			.chartuser .slied{
+				margin-top: 1rem;
+				padding: 0.4rem 0;
+				font-size: 1.4rem;
+				color: #3399FF;
+				border: 1px solid #3399FF;
+				background-color: #FFFFFF;
+				border-radius: 2rem;
+				text-align: center;
+				cursor: pointer;
+			}
+			.chartuser .title{
+				display: inline-block;
+				font-size: 1.4rem;
+				background-color: #FFFFFF;
+			}
+			.chartuser .oper{
+				display: flex;
+				margin-top: 1rem;
+			}
+			.chartuser .oper>div{
+				font-size: 1.2rem;
+				margin: 0.4rem;
+				padding: 0.4rem 1.2rem;
+				border: 1px solid #D4D4D4;
+				background-color: #FFFFFF;
+				border-radius: 2rem;
+				cursor: pointer;
+			}
+			.chartuser .user{
+				display: flex;
+				flex-wrap: wrap;
+			}
+			.chartuser .user>div{
+				font-size: 1.2rem;
+				margin: 0.4rem;
+				padding: 0.4rem 1.2rem;
+				border: 1px solid #D4D4D4;
+				background-color: #FFFFFF;
+				border-radius: 2rem;
+				cursor: pointer;
+			}
+			.chartuser .user>div.active{
+				color: #3399FF;
+				border-color: #3399FF;
+			}
 			.belowcon{
 				margin-top: 1rem;
 			}
@@ -573,6 +627,7 @@
 	<body>
 		<app></app>
 		<script>
+			window.wx = undefined;
 			new Vue({
 				el:'app',
 				data:{
@@ -615,7 +670,15 @@
 					ischart:false,
 					isbelow:false,
 					belowdata:[],
+					chartoption:null,
+					ischartuser:false,
 					updatetext:[
+						{
+							title:'V0.1.26',
+							con:[
+								'• 优化：更换折线图筛选项功能。',
+							],
+						},
 						{
 							title:'V0.1.25',
 							con:[
@@ -759,6 +822,21 @@
 							};
 							return color;
 						};
+					},
+					chartuser(){
+						let names=[];
+						for(let user of JSON.parse(this.catchdata.list[0].text)){
+							names.push(user.name);
+						};
+						let arr=[];
+						for(let key in this.chartoption.legend.selected){
+							arr.push({
+								name:key,
+								state:this.chartoption.legend.selected[key],
+								now:names.indexOf(key)>=0?true:false,
+							});
+						};
+						return arr;
 					},
 				},
 				template:`
@@ -904,6 +982,20 @@
 								<button class="btn" v-on:click="belowshow">贡献排名</button>
 								<button class="btn" v-if="isbelow" v-on:click="belowtoimg">图片</button>
 							</div>
+							<div class="chartuser">
+								<div class="slied" v-if="ischart&&!ischartuser" v-on:click="ischartuser=true">展开筛选项 ▼</div>
+								<div class="slied" v-if="ischart&&ischartuser" v-on:click="ischartuser=false">收起筛选项 ▲</div>
+								<div class="oper" v-if="ischartuser"><div v-on:click="chartusercheckall">全选</div><div v-on:click="chartuserchecknotall">全不选</div></div>
+								<div class="title" v-if="ischartuser">在部落内</div>
+								<div class="user" v-if="ischartuser&&ischart&&!!chartoption">
+									<div v-for="item in chartuser" v-bind:class="{active:item.state}" v-if="item.now" v-on:click="chartdatashow(item.name)">{{item.name}}</div>
+								</div>
+								<div class="title" v-if="ischartuser">离开部落</div>
+								<div class="user" v-if="ischartuser&&ischart&&!!chartoption">
+									<div v-for="item in chartuser" v-bind:class="{active:item.state}" v-if="!item.now" v-on:click="chartdatashow(item.name)">{{item.name}}</div>
+								</div>
+								<div class="slied" v-if="ischart&&ischartuser" v-on:click="ischartuser=false">收起筛选项 ▲</div>
+							</div>
 							<div class="chartcon" ref="chart" v-if="ischart"></div>
 							<div class="belowcon" v-if="isbelow">
 								<div class="table domtoimg anisa" ref="below">
@@ -1006,8 +1098,10 @@
 				`,
 				watch:{
 					tab(e){
-						this.chart.dispose();
-						this.ischart=false;
+						if(!!this.chart){
+							this.chart.dispose();
+							this.ischart=false;
+						};
 						if(e=='table'){
 							setTimeout(()=>{
 								this.pageobs.observe(this.$refs.tabletd);
@@ -1378,12 +1472,14 @@
 					},
 					chartshow(){
 						if(this.ischart){
+							this.chart.dispose();
+							this.ischart=false;
 							return false;
 						};
 						this.ischart=true;
 						setTimeout(()=>{
 							this.chart=echarts.init(this.$refs.chart, null, { renderer: 'svg' });
-							let option = {
+							this.chartoption = {
 								grid:{
 									top:60,
 									bottom:20,
@@ -1391,12 +1487,12 @@
 									right:20,
 								},
 								legend: {
-									top: 10,
-									itemWidth: 10,
-									itemHeight: 10,
-									selector: true,
-									selectorPosition:'stert',
-									type: 'scroll',
+									show:false,
+									selected:{
+									},
+								},
+								tooltip: {
+									trigger: 'axis'
 								},
 								dataZoom:[
 									{},
@@ -1432,16 +1528,16 @@
 							let firstp={};
 							let zoomp=0;
 							for(let list in times){
-								option.xAxis.data.push(times[list].title);
+								this.chartoption.xAxis.data.push(times[list].title);
 								let avgtotal=0;
 								for(let user of JSON.parse(times[list].text)){
-									let s=option.series.find((v)=>{
+									let s=this.chartoption.series.find((v)=>{
 										return v.id==user.id;
 									});
 									if(!!!s){
 										let data=[];
 										data[list]=parseFloat((user.avg/1000000).toFixed(2));
-										option.series.push({
+										this.chartoption.series.push({
 											id:user.id,
 											name:user.name,
 											data: data,
@@ -1471,15 +1567,30 @@
 										});
 										firstp[user.id]=list;
 									}else{
+										s.name=user.name;
 										s.data[list]=parseFloat((user.avg/1000000).toFixed(2));
 									};
 									avgtotal+=parseFloat((user.avg/1000000).toFixed(2));
 								};
-								avgtotal=avgtotal/JSON.parse(times[list].text).length;
-								option.series[0].data.push(avgtotal);
+								avgtotal=parseFloat((avgtotal/JSON.parse(times[list].text).length).toFixed(2));
+								this.chartoption.series[0].data.push(avgtotal);
 							};
-							console.log(firstp);
-							this.chart.setOption(option);
+							let chartdata={};
+							let names=[];
+							for(let user of JSON.parse(this.catchdata.list[0].text)){
+								names.push(user.name);
+							};
+							for(let item of this.chartoption.series){
+								if(item.name!='平均值'){
+									if(names.indexOf(item.name)>=0){
+										chartdata[item.name]=true;
+									}else{
+										chartdata[item.name]=false;
+									};
+								};
+							};
+							this.chartoption.legend.selected=chartdata;
+							this.chart.setOption(this.chartoption);
 							this.chart.on('dataZoom',(params)=>{
 								zoomp=this.chart.getOption().dataZoom[1].startValue;
 							});
@@ -1574,6 +1685,28 @@
 							aTag.click();
 							URL.revokeObjectURL(objectURL);
 						});
+					},
+					chartdatashow(name){
+						this.chartoption.legend.selected[name]=!this.chartoption.legend.selected[name];
+						this.chart.setOption(this.chartoption);
+					},
+					chartusercheckall(){
+						let names=[];
+						for(let user of JSON.parse(this.catchdata.list[0].text)){
+							names.push(user.name);
+						};
+						for(let key in this.chartoption.legend.selected){
+							if(names.indexOf(key)>=0){
+								this.chartoption.legend.selected[key]=true;
+							};
+						};
+						this.chart.setOption(this.chartoption);
+					},
+					chartuserchecknotall(){
+						for(let key in this.chartoption.legend.selected){
+							this.chartoption.legend.selected[key]=false;
+						};
+						this.chart.setOption(this.chartoption);
 					},
 				},
 				mounted(){
