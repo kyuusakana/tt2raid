@@ -268,6 +268,12 @@
 				white-space: nowrap;
 				text-overflow: ellipsis;
 			}
+			.table.poa td>div{
+				max-height: 3rem;
+				overflow: hidden;
+				white-space: nowrap;
+				text-overflow: ellipsis;
+			}
 			.hint{
 				margin-top: 1rem;
 				padding: 0 2rem;
@@ -384,6 +390,11 @@
 			.catchbox.show{
 				opacity: 1;
 				pointer-events: all;
+			}
+			.catchbox .title{
+				padding: 1rem;
+				padding-bottom: 0;
+				font-size: 1.4rem;
 			}
 			.catchbox .close{
 				display: block;
@@ -622,6 +633,21 @@
 			.belowcon{
 				margin-top: 1rem;
 			}
+			.partbtn{
+				display: flex;
+				flex-wrap: wrap;
+				padding: 1rem 1.6rem;
+			}
+			.partbtn button{
+				margin: 0.4rem;
+				padding: 0.4rem 1.2rem;
+				background-color: #FFFFFF;
+				border-radius: 0.4rem;
+			}
+			.partbtn button.active{
+				color: #FFFFFF;
+				background-color: #3399FF;
+			}
 		</style>
 	</head>
 	<body>
@@ -644,6 +670,17 @@
 						output:[],
 						flag:'25',
 						finish:false,
+					},
+					catchpart:{
+						model:'part',
+						list:[
+							{
+								id:null,
+								name:'默认',
+								list:[],
+							}
+						],
+						active:null,
 					},
 					catchdata:{
 						show:false,
@@ -673,6 +710,13 @@
 					chartoption:null,
 					ischartuser:false,
 					updatetext:[
+						{
+							title:'V0.1.27',
+							con:[
+								'• 特性：增加记录分组功能和选部分记录功能。',
+								'• 修复：修复部分情况表格显示问题。',
+							],
+						},
 						{
 							title:'V0.1.26',
 							con:[
@@ -838,6 +882,12 @@
 						};
 						return arr;
 					},
+					partitem(){
+						let item=this.catchpart.list.find((v)=>{
+							return v.id==this.catchpart.active;
+						});
+						return item;
+					},
 				},
 				template:`
 					<div class="anisn">
@@ -884,7 +934,7 @@
 											<th class="anitran1" v-bind:style="poa2.th2">名字</th>
 										</tr>
 										<tr v-for="(item,index) in output">
-											<td><font v-bind:color="ncolor(qcolor(item.qty),dcolor(item.dmgrank))">{{item.name}}</font></td>
+											<td><div><font v-bind:color="ncolor(qcolor(item.qty),dcolor(item.dmgrank))">{{item.name}}</font></div></td>
 										</tr>
 									</table>
 								</div>
@@ -1020,8 +1070,15 @@
 						</div>
 						<div v-if="tab=='record'">
 							<div class="control">
+								<button class="btn" v-on:click="creatpart">新建分组</button>
+								<button class="btn" v-if="!!catchpart.active" v-on:click="delpart">删除分组</button>
+							</div>
+							<div class="partbtn" v-if="catchpart.list.length>1">
+								<button v-for="item in catchpart.list" v-bind:class="{active:catchpart.active==item.id}" v-on:click="changepart(item.id)">{{item.name}}</button>
+							</div>
+							<div class="control">
 								<button class="btn" v-on:click="catch_in">导入记录</button>
-								<button class="btn" v-on:click="catch_out">导出记录</button>
+								<button class="btn" v-on:click="catch_out" v-if="catchdata.list.length>0">导出记录</button>
 							</div>
 							<div class="catchcon">
 								<div class="dd" v-for="(item,index) of catchdata.list">
@@ -1075,6 +1132,7 @@
 						<div class="catchbox anitran1" v-bind:class="{show:catchdata.show}">
 							<i class="close" v-on:click="catchdata.show=false">✕</i>
 							<div class="con anitran1" v-bind:class="{show:catchdata.show}">
+								<div class="title">分组：{{partitem.name}}</div>
 								<div class="end" v-if="catchdata.list.length>0">到顶了</div>
 								<div class="dd" v-for="(item,index) of catchdata.list" v-bind:class="{active:!!catchdata.item&&catchdata.item.time==item.time}" v-on:click="catch_get(index,item)">
 									<span>{{item.title}} (+{{item.flag}}%)</span>
@@ -1246,7 +1304,11 @@
 						this.flag=this.catchdata.item.flag;
 					},
 					savedata(){
-						localStorage.setItem('catchdata',JSON.stringify(this.catchdata.list));
+						let list=this.catchpart.list.find((v)=>{
+							return v.id==this.catchpart.active;
+						});
+						list.list=this.catchdata.list;
+						localStorage.setItem('catchpart',JSON.stringify(this.catchpart));
 					},
 					inp_start(input){
 						this.title='';
@@ -1431,15 +1493,16 @@
 							let reader = new FileReader();
 							reader.readAsText(file.files[0]);
 							reader.onload = (e) =>{
-								let list;
+								let data;
 								try{
-									list=JSON.parse(decodeURIComponent(atob(e.target.result)));
+									data=JSON.parse(decodeURIComponent(atob(e.target.result)));
 								}catch(e){};
-								if(!!!list){
+								if(!!!data){
 									alert('数据异常');
 									return false;
 								};
-								this.catchdata.list=list;
+								this.partitem.list=data;
+								this.catchdata.list=this.partitem.list;
 								this.savedata();
 								alert('导入成功');
 							}
@@ -1447,6 +1510,9 @@
 						file.click();
 					},
 					catch_out(){
+						let list=this.catchpart.list.find((v)=>{
+							return v.id==this.catchpart.active
+						});
 						const stringData = btoa(encodeURIComponent(JSON.stringify(this.catchdata.list)));
 						const blob = new Blob([stringData], {
 							type: "text/plain;charset=utf-8"
@@ -1454,7 +1520,7 @@
 						const objectURL = URL.createObjectURL(blob);
 						const aTag = document.createElement('a');
 						aTag.href = objectURL;
-						aTag.download = 'tt2raid_catch_'+JSON.stringify(new Date()).replace(/\"/g, "").replace(/T/g, "_").replace(/:/g, "").replace(/\./g, "").replace(/Z/g, "").replace(/ /g, "")+'.txt';
+						aTag.download = 'tt2raid_catch_'+list.name+'_'+JSON.stringify(new Date()).replace(/\"/g, "").replace(/T/g, "_").replace(/:/g, "").replace(/\./g, "").replace(/Z/g, "").replace(/ /g, "")+'.txt';
 						aTag.click();
 						URL.revokeObjectURL(objectURL);
 					},
@@ -1708,18 +1774,67 @@
 						};
 						this.chart.setOption(this.chartoption);
 					},
+					creatpart(){
+						let name=prompt("请输入分组名称");
+						if(!!name){
+							let id=parseInt(new Date().getTime()/1000);
+							this.catchpart.list.push({
+								id:id,
+								name:name,
+								list:[],
+							});
+							this.catchpart.active=id;
+							this.catchdata.list=[];
+							localStorage.setItem('catchpart',JSON.stringify(this.catchpart));
+						};
+					},
+					delpart(){
+						let bool=confirm('确定要删除'+this.partitem.name+'这个分组么？');
+						if(bool){
+							let i=this.catchpart.list.indexOf(this.partitem);
+							this.catchpart.list.splice(i, 1);
+							this.catchpart.active=this.catchpart.list[i-1].id;
+							this.catchdata.list=this.partitem.list;
+							this.isbelow=false;
+						};
+						this.savedata();
+					},
+					changepart(id){
+						this.catchpart.active=id;
+						this.catchdata.list=this.partitem.list;
+						this.isbelow=false;
+						localStorage.setItem('catchpart',JSON.stringify(this.catchpart));
+					},
 				},
 				mounted(){
-					let c;
+					// localStorage.removeItem('catchpart')
+					let catchpart;
 					try{
-						c=JSON.parse(localStorage.getItem('catchdata'));
+						catchpart=JSON.parse(localStorage.getItem('catchpart'));
 					}catch(e){
-						c=[];
+						catchpart=null;
 					}
-					if(!!!c){
-						c=[];
+					if(!!!catchpart){
+						catchpart=null;
 					};
-					this.catchdata.list=c;
+					if(!!catchpart){
+						this.catchpart=catchpart;
+						this.catchdata.list=this.partitem.list;
+					}else{
+						let catchdata;
+						try{
+							catchdata=JSON.parse(localStorage.getItem('catchdata'));
+						}catch(e){
+							catchdata=null;
+						}
+						if(!!!catchdata){
+							catchdata=null;
+						};
+						if(!!catchdata){
+							this.catchpart.list[0].list=catchdata;
+							this.catchdata.list=catchdata;
+						};
+					};
 					this.pageobs = new IntersectionObserver((entries, observer) => { 
 						entries.forEach(entry => {
 						console.log(entry.isIntersecting);
